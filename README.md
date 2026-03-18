@@ -1,16 +1,31 @@
-# React + Vite
+# 🏰 Jardín Casa Blanca Necaxa - Cotizador Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+¡Bienvenido al repositorio oficial de la plataforma web de **Jardín Casa Blanca**! Esta es una aplicación interactiva diseñada para que los clientes puedan personalizar sus eventos y reservar estancias de forma intuitiva y elegante.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Características Principales
 
-## React Compiler
+* **Experiencia Dual:** Flujos independientes para la renta del **Salón de Eventos** y la **Cabaña VIP**.
+* **Cotizador Dinámico:** Desglose concepto por concepto (mesas, mantelería, inflables, música) con actualización de precios en tiempo real.
+* **Gestión de Cabaña:** Selección de fechas (check-in/check-out) y cálculo automático por número de huéspedes y noches.
+* **Integración con WhatsApp:** Envío de solicitudes de cotización formales y detalladas directamente al administrador.
+* **Diseño Premium:** Interfaz responsive (móvil/desktop) con estética elegante en tonos blanco y dorado.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Tecnologías Utilizadas
 
-## Expanding the ESLint configuration
+Este proyecto fue construido con las mejores herramientas de desarrollo moderno:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* [React 19](https://reactjs.org/) - Biblioteca principal para la interfaz.
+* [Vite](https://vitejs.dev/) - Motor de desarrollo ultra rápido.
+* [Tailwind CSS v4](https://tailwindcss.com/) - Framework de estilos para un diseño moderno y rápido.
+* [Lucide React](https://lucide.dev/) - Set de iconos vectoriales elegantes.
+* [Google Maps API](https://maps.google.com) - Ubicación interactiva del negocio.
+
+## 🚀 Instalación y Desarrollo
+
+Si deseas ejecutar este proyecto localmente, sigue estos pasos:
+
+1. **Clonar el repositorio:**
+   ```bash
+   git clone [https://github.com/UsielOM/jardin-casa-blanca.git](https://github.com/UsielOM/jardin-casa-blanca.git)
