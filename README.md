@@ -29,3 +29,18 @@ Si deseas ejecutar este proyecto localmente, sigue estos pasos:
 1. **Clonar el repositorio:**
    ```bash
    git clone [https://github.com/UsielOM/jardin-casa-blanca.git](https://github.com/UsielOM/jardin-casa-blanca.git)
+
+2. **Entrar a la carpeta del  proyecto:**
+   ```bash
+   cd web-salon
+
+3. **Instalar dependencias:**
+   ```bash
+   npm install
+
+4. **Iniciar el servidor de desarrollo:**
+   ```bash
+   npm run dev
+
+5. **Ver en el navegador:**
+*  Abre **http://localhost:5173:** para ver el resultado.
