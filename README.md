@@ -28,7 +28,7 @@ Si deseas ejecutar este proyecto localmente, sigue estos pasos:
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone [https://github.com/UsielOM/jardin-casa-blanca.git](https://github.com/UsielOM/jardin-casa-blanca.git)
+   git clone https://github.com/UsielOM/jardin-casa-blanca.git
 
 2. **Entrar a la carpeta del  proyecto:**
    ```bash
