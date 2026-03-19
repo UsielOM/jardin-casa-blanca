@@ -12,7 +12,7 @@ export default function HomeSelection({ onFlowSelect }) {
       >
         <div 
           className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" 
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=1920')" }}
+          style={{ backgroundImage: "url('/img/salon/salon-rosa.webp')" }}
         >
           <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
         </div>

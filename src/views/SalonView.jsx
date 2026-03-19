@@ -1,3 +1,4 @@
+// src/views/SalonView.jsx
 import React, { useState, useRef } from "react";
 import {
   CheckCircle, ChevronLeft, ChevronRight, Clock, Info, User, Tag,
@@ -23,12 +24,11 @@ export default function SalonView() {
       t2: { active: false, mantelQty: 0, cubreQty: 0 },
     },
     inflatables: [],
-    music: [], // Lista de paquetes seleccionados
+    music: [], 
   });
   const [cabinConfig, setCabinConfig] = useState({ rent: false, checkIn: "", checkOut: "", guests: 2 });
 
-  // Estados para la sección de Música Dinámica
-  const [musicTab, setMusicTab] = useState("sounds"); // 'sounds' o 'bands'
+  const [musicTab, setMusicTab] = useState("sounds");
   const [currentMusicIndex, setCurrentMusicIndex] = useState(0);
   const [showMusicPackages, setShowMusicPackages] = useState(false);
   const packageScrollRef = useRef(null);
@@ -118,9 +118,10 @@ export default function SalonView() {
     selections.inflatables.forEach((i) => (msg += `🎈 ${i.name} - $${i.price} MXN\n`));
     selections.music.forEach((m) => (msg += `🎵 ${m.providerName}: ${m.packageName} - $${m.price} MXN\n`));
 
-    if (cabinConfig.rent) msg += `🏡 Cabaña VIP (${getCabinNights()} noches) - $${cabinData.price * cabinConfig.guests * getCabinNights()} MXN\n`;
+    if (cabinConfig.rent) msg += `🏡 Cabaña VIP (${getCabinNights()} noches, ${cabinConfig.guests} pers.) - $${cabinData.price * cabinConfig.guests * getCabinNights()} MXN\n`;
 
     msg += `\n💰 *COSTO TOTAL ESTIMADO:* $${totalEstimadoSalon()} MXN\n`;
+    msg += `\nℹ️ Una vez confirmada la disponibilidad de la fecha, se validará el precio final por WhatsApp.`;
     return encodeURIComponent(msg);
   };
 
@@ -136,7 +137,7 @@ export default function SalonView() {
     <div className="fade-in pt-20">
       {/* 1. Header Hero */}
       <header className="relative h-[40vh] md:h-[60vh] flex items-center justify-center text-center px-4">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=1920')" }}>
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/img/salon/salon-rosa.webp')" }}>
           <div className="absolute inset-0 bg-black/60"></div>
         </div>
         <div className="relative text-white max-w-4xl">
@@ -161,18 +162,41 @@ export default function SalonView() {
                     <button onClick={() => toggleTableConfig(table.id)} className={`w-full py-4 rounded-sm text-sm font-bold uppercase transition-all mb-8 ${t.active ? "bg-gold text-white" : "border-2 border-gray-400"}`}>
                       {t.active ? "✓ Seleccionada" : "Seleccionar este tipo"}
                     </button>
-                    <div className="space-y-4 pt-6 border-t border-gray-100">
-                      {[ {f:'mantelQty', l:'CON MANTEL', p:100}, {f:'cubreQty', l:'CON CUBRE MANTEL', p:110} ].map(field => (
-                        <div key={field.f} className="flex justify-between items-center bg-gray-50 p-4 rounded border">
-                          <div className="text-left"><p className="font-bold text-gray-800 text-sm">{field.l}</p><p className="text-[10px] text-gray-500">${field.p} c/u</p></div>
-                          <div className="flex items-center border rounded bg-white overflow-hidden shadow-sm">
-                            <button onClick={() => updateTableQtyConfig(table.id, field.f, -1)} className="px-5 py-2 font-bold text-xl hover:bg-gray-100">-</button>
-                            <span className="px-5 font-bold text-gray-900 w-10 text-center">{t[field.f]}</span>
-                            <button onClick={() => updateTableQtyConfig(table.id, field.f, 1)} className="px-5 py-2 font-bold text-xl hover:bg-gray-100">+</button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+<div className="space-y-4 pt-6 border-t border-gray-100">
+  {[ 
+    {f:'mantelQty', l:'CON MANTEL', p:100}, 
+    {f:'cubreQty', l:'CON CUBRE MANTEL', p:110} 
+  ].map(field => (
+    <div key={field.f} className="flex justify-between items-center bg-gray-50 p-3 sm:p-4 rounded border gap-2">
+      {/* Contenedor de Texto: flex-1 y min-w-0 para que el texto no empuje al contador */}
+      <div className="text-left min-w-0 flex-1">
+        <p className="font-bold text-gray-800 text-xs sm:text-sm truncate sm:whitespace-normal uppercase tracking-tight">
+          {field.l}
+        </p>
+        <p className="text-[10px] text-gray-500">${field.p} c/u</p>
+      </div>
+
+      {/* Contador: flex-shrink-0 para que nunca se haga más pequeño de lo necesario */}
+      <div className="flex items-center border rounded bg-white overflow-hidden shadow-sm flex-shrink-0 h-10 border-gray-300">
+        <button 
+          onClick={() => updateTableQtyConfig(table.id, field.f, -1)} 
+          className="px-3 sm:px-5 py-1 sm:py-2 font-bold text-lg sm:text-xl hover:bg-gray-100 active:bg-gray-200 transition-colors text-gold"
+        >
+          -
+        </button>
+        <span className="w-8 sm:w-10 text-center font-bold text-gray-900 text-sm sm:text-base border-x border-gray-100">
+          {t[field.f]}
+        </span>
+        <button 
+          onClick={() => updateTableQtyConfig(table.id, field.f, 1)} 
+          className="px-3 sm:px-5 py-1 sm:py-2 font-bold text-lg sm:text-xl hover:bg-gray-100 active:bg-gray-200 transition-colors text-gold"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
                   </div>
                 </div>
               );
@@ -241,7 +265,6 @@ export default function SalonView() {
                   {showMusicPackages ? <Minus /> : <Plus />}
                 </button>
               </div>
-              {/* Botones de navegación de artistas si hay más de uno */}
               {currentMusicData.length > 1 && (
                 <div className="absolute top-4 right-4 flex items-center gap-4 bg-gray-900/80 px-4 py-2 rounded-full border border-white/10 z-20">
                   <button onClick={() => { setCurrentMusicIndex((prev) => (prev - 1 + currentMusicData.length) % currentMusicData.length); setShowMusicPackages(false); }} className="hover:text-gold"><ChevronLeft className="w-5 h-5" /></button>
@@ -285,120 +308,88 @@ export default function SalonView() {
         </div>
       </section>
 
-{/* 5. Cabaña Opcional (Actualizada con toda la información) */}
-<section id="cabana" className="py-16 md:py-24 bg-white px-4 md:px-6">
-  <div className="max-w-6xl mx-auto flex flex-col lg:flex-row shadow-2xl rounded-sm overflow-hidden border border-gray-100">
-    {/* Imagen Izquierda */}
-    <div className="lg:w-1/2 h-[350px] md:h-[500px] lg:h-auto">
-      <img src={cabinData.img} alt="Cabaña" className="w-full h-full object-cover" />
-    </div>
+      {/* 5. Cabaña Opcional */}
+      <section id="cabana" className="py-16 md:py-24 bg-white px-4 md:px-6">
+        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row shadow-2xl rounded-sm overflow-hidden border border-gray-100">
+          <div className="lg:w-1/2 h-[350px] md:h-[500px] lg:h-auto">
+            <img src={cabinData.img} alt="Cabaña" className="w-full h-full object-cover" />
+          </div>
 
-    {/* Contenido Derecha */}
-    <div className="lg:w-1/2 bg-[#2A2A2A] text-white p-8 md:p-12 lg:p-16 flex flex-col justify-center">
-      <div className="flex items-center gap-4 mb-6">
-        <Tent className="w-10 h-10 text-gold" />
-        <h2 className="font-serif text-4xl md:text-5xl text-gold font-bold uppercase tracking-tight">Cabaña VIP (Adicional)</h2>
-      </div>
-      
-      <p className="text-gray-200 mb-8 text-lg font-medium leading-relaxed font-serif">
-        {cabinData.desc}
-      </p>
+          <div className="lg:w-1/2 bg-[#2A2A2A] text-white p-8 md:p-12 lg:p-16 flex flex-col justify-center">
+            <div className="flex items-center gap-4 mb-6">
+              <Tent className="w-10 h-10 text-gold" />
+              <h2 className="font-serif text-4xl md:text-5xl text-gold font-bold uppercase tracking-tight">Cabaña VIP (Adicional)</h2>
+            </div>
+            
+            <p className="text-gray-200 mb-8 text-lg font-medium leading-relaxed font-serif">{cabinData.desc}</p>
 
-      {/* Amenidades */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-300 mb-10 font-bold">
-        {cabinData.amenities.map((a, i) => (
-          <li key={i} className="flex gap-2 items-center">
-            <CheckCircle className="w-4 h-4 text-gold flex-shrink-0" /> {a}
-          </li>
-        ))}
-      </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-300 mb-10 font-bold">
+              {cabinData.amenities.map((a, i) => (
+                <li key={i} className="flex gap-2 items-center">
+                  <CheckCircle className="w-4 h-4 text-gold flex-shrink-0" /> {a}
+                </li>
+              ))}
+            </div>
 
-      {/* Horarios y Políticas */}
-      <div className="bg-white/5 border border-white/10 p-6 text-xs font-medium leading-relaxed rounded mb-10 text-gray-300">
-         <p className="mb-4 uppercase tracking-widest border-b border-white/10 pb-2">
-           <strong className="text-gold">Horarios:</strong> {cabinData.schedule}
-         </p>
-         <p className="leading-relaxed">
-           <strong className="text-gold uppercase tracking-widest block mb-1">Políticas:</strong> 
-           {cabinData.policy}
-         </p>
-      </div>
+            <div className="bg-white/5 border border-white/10 p-6 text-xs font-medium leading-relaxed rounded mb-10 text-gray-300">
+              <p className="mb-4 uppercase tracking-widest border-b border-white/10 pb-2"><strong className="text-gold">Horarios:</strong> {cabinData.schedule}</p>
+              <p className="leading-relaxed"><strong className="text-gold uppercase tracking-widest block mb-1">Políticas:</strong> {cabinData.policy}</p>
+            </div>
 
-      {/* Inputs de Reserva */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
-        <div>
-          <label className="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Entrada</label>
-          <input 
-            type="date" 
-            value={cabinConfig.checkIn} 
-            onChange={e => setCabinConfig({...cabinConfig, checkIn: e.target.value})} 
-            className="w-full bg-transparent border-b-2 border-gray-600 pb-2 text-white focus:border-gold outline-none text-sm transition-all" 
-          />
-        </div>
-        <div>
-          <label className="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Salida</label>
-          <input 
-            type="date" 
-            value={cabinConfig.checkOut} 
-            onChange={e => setCabinConfig({...cabinConfig, checkOut: e.target.value})} 
-            className="w-full bg-transparent border-b-2 border-gray-600 pb-2 text-white focus:border-gold outline-none text-sm transition-all" 
-          />
-        </div>
-        <div>
-          <label className="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Huéspedes</label>
-          <input 
-            type="number" 
-            min="1" 
-            max="6" 
-            value={cabinConfig.guests} 
-            onChange={e => setCabinConfig({...cabinConfig, guests: Math.min(6, Math.max(1, parseInt(e.target.value)||1))})} 
-            className="w-full bg-transparent border-b-2 border-gray-600 pb-2 text-white focus:border-gold outline-none text-sm transition-all" 
-          />
-        </div>
-      </div>
-
-      {/* Subtotal y Nota */}
-{/* Subtotal Cabaña con Desglose de Cálculo */}
-<div className="bg-black/40 p-8 rounded-sm mb-8 border border-white/10 shadow-inner">
-  <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 pb-6 border-b border-white/5">
-    <div className="text-left">
-      <p className="text-[10px] text-gold font-bold uppercase tracking-[0.2em] mb-1">Precio Base</p>
-      <p className="text-2xl font-serif font-bold">${cabinData.price} <span className="text-xs text-gray-400 uppercase font-sans">MXN por persona / noche</span></p>
-    </div>
-    <div className="text-center md:text-right">
-      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Tu selección</p>
-      <p className="text-sm font-bold text-gray-200 uppercase tracking-tighter">
-        {cabinConfig.guests} Pers. × {getCabinNights()} Noches
-      </p>
-    </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+              <div><label className="block text-[10px] font-bold text-gray-400 mb-2 uppercase">Entrada</label><input type="date" value={cabinConfig.checkIn} onChange={e => setCabinConfig({...cabinConfig, checkIn: e.target.value})} className="w-full bg-transparent border-b-2 border-gray-600 pb-2 text-white focus:border-gold outline-none text-sm transition-all" /></div>
+              <div><label className="block text-[10px] font-bold text-gray-400 mb-2 uppercase">Salida</label><input type="date" value={cabinConfig.checkOut} onChange={e => setCabinConfig({...cabinConfig, checkOut: e.target.value})} className="w-full bg-transparent border-b-2 border-gray-600 pb-2 text-white focus:border-gold outline-none text-sm transition-all" /></div>
+             <div className="w-full">
+  <label className="block text-[10px] font-bold text-gray-400 mb-3 uppercase tracking-widest text-center sm:text-left">
+    Huéspedes (Máx. 6)
+  </label>
+  <div className="flex items-center border-2 border-gray-600 rounded bg-transparent overflow-hidden h-12 w-full">
+    <button 
+      onClick={() => setCabinConfig({...cabinConfig, guests: Math.max(1, cabinConfig.guests - 1)})}
+      className="flex-1 h-full font-bold text-2xl text-gold hover:bg-white/5 active:bg-white/10 transition-colors border-r border-gray-600"
+    >
+      -
+    </button>
+    <span className="w-16 text-center font-bold text-xl text-white">
+      {cabinConfig.guests}
+    </span>
+    <button 
+      onClick={() => setCabinConfig({...cabinConfig, guests: Math.min(6, cabinConfig.guests + 1)})}
+      className="flex-1 h-full font-bold text-2xl text-gold hover:bg-white/5 active:bg-white/10 transition-colors border-l border-gray-600"
+    >
+      +
+    </button>
   </div>
+</div>            </div>
 
-  <p className="text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-widest">Subtotal Estancia</p>
-  <div className="flex flex-col items-center">
-    <p className="font-serif text-5xl text-gold font-bold tracking-tighter">
-      ${cabinData.price * cabinConfig.guests * getCabinNights()} MXN
-    </p>
-    
-    {/* NOTA ACLARATORIA DEL CÁLCULO */}
-    <div className="mt-6 flex items-start gap-3 text-left bg-white/5 p-4 rounded-sm border border-white/5 w-full">
-      <Info className="w-5 h-5 text-gold flex-shrink-0" />
-      <p className="text-[11px] text-gray-400 leading-relaxed">
-        <strong className="text-gray-200 uppercase block mb-1">¿Cómo se calcula?</strong>
-        Multiplicamos el costo de <span className="text-gold">${cabinData.price}</span> por el número de huéspedes (<span className="text-white">{cabinConfig.guests}</span>) y luego por el total de noches (<span className="text-white">{getCabinNights()}</span>).
-      </p>
-    </div>
-  </div>
-</div>
+            {/* Subtotal Cabaña con Desglose */}
+            <div className="bg-black/40 p-8 rounded-sm mb-8 border border-white/10 shadow-inner">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 pb-6 border-b border-white/5">
+                <div className="text-left">
+                  <p className="text-[10px] text-gold font-bold uppercase tracking-[0.2em] mb-1">Precio Base</p>
+                  <p className="text-2xl font-serif font-bold">${cabinData.price} <span className="text-xs text-gray-400 uppercase font-sans">MXN por persona / noche</span></p>
+                </div>
+                <div className="text-center md:text-right">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Tu selección</p>
+                  <p className="text-sm font-bold text-gray-200 uppercase tracking-tighter">{cabinConfig.guests} Pers. × {getCabinNights()} Noches</p>
+                </div>
+              </div>
+              <p className="text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-widest text-center">Subtotal Estancia</p>
+              <div className="flex flex-col items-center">
+                <p className="font-serif text-5xl text-gold font-bold tracking-tighter">${cabinData.price * cabinConfig.guests * getCabinNights()} MXN</p>
+                <div className="mt-6 flex items-start gap-3 text-left bg-white/5 p-4 rounded-sm border border-white/5 w-full">
+                  <Info className="w-5 h-5 text-gold flex-shrink-0" />
+                  <p className="text-[11px] text-gray-400 leading-relaxed">Multiplicamos el costo de <span className="text-gold">${cabinData.price}</span> por el número de huéspedes (<span className="text-white">{cabinConfig.guests}</span>) y luego por el total de noches (<span className="text-white">{getCabinNights()}</span>).</p>
+                </div>
+              </div>
+            </div>
 
-      <button 
-        onClick={() => setCabinConfig(prev => ({...prev, rent: !prev.rent}))} 
-        className={`w-full py-5 text-base font-bold uppercase border-2 transition-all tracking-widest ${cabinConfig.rent ? 'bg-gold border-gold text-white shadow-lg' : 'border-gold text-gold hover:bg-gold hover:text-white'}`}
-      >
-        {cabinConfig.rent ? '✓ AGREGADA A LA COTIZACIÓN' : 'AGREGAR CABAÑA AL EVENTO'}
-      </button>
-    </div>
-  </div>
-</section>
+            <button onClick={() => setCabinConfig(prev => ({...prev, rent: !prev.rent}))} className={`w-full py-5 text-base font-bold uppercase border-2 transition-all ${cabinConfig.rent ? 'bg-gold border-gold text-white shadow-lg' : 'border-gold text-gold hover:bg-gold hover:text-white'}`}>
+              {cabinConfig.rent ? '✓ AGREGADA A LA COTIZACIÓN' : 'AGREGAR CABAÑA AL EVENTO'}
+            </button>
+          </div>
+        </div>
+      </section>
 
       {/* 6. Cotizador Final */}
       <section id="cotizador" className="py-20 bg-gold px-4 md:px-6">
@@ -418,12 +409,17 @@ export default function SalonView() {
               
               <div className="bg-gray-50 p-8 border-2 border-gray-200 rounded-sm space-y-6">
                 <div className="flex items-center gap-4 border-b-2 border-gray-200 pb-5"><CheckCircle className="w-8 h-8 text-gold" /><span className="font-serif text-3xl font-bold">Base Salón (6h) - $2,500</span></div>
-                <div className="flex justify-between items-center gap-6 pt-4 text-gray-700 font-bold">
-                  <span className="text-xs uppercase tracking-widest text-gray-500">Horas Extra ($250/h):</span>
-                  <div className="flex items-center border-2 border-gray-300 rounded bg-white overflow-hidden shadow-sm">
-                    <button onClick={() => setSalonConfig({...salonConfig, extraHours: Math.max(0, salonConfig.extraHours - 1)})} className="px-6 py-2 font-bold hover:bg-gray-100">-</button>
-                    <span className="px-8 font-bold text-xl text-gray-900">{salonConfig.extraHours}</span>
-                    <button onClick={() => setSalonConfig({...salonConfig, extraHours: salonConfig.extraHours + 1})} className="px-6 py-2 font-bold hover:bg-gray-100">+</button>
+                
+                {/* Horas Extra Responsive */}
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pt-6 border-t border-gray-200">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-gold" />
+                    <span className="font-bold text-xs uppercase tracking-widest text-gray-500">Horas Extra ($250/h):</span>
+                  </div>
+                  <div className="flex items-center border-2 border-gray-300 rounded bg-white overflow-hidden shadow-sm h-12 w-full sm:w-auto">
+                    <button onClick={() => setSalonConfig({...salonConfig, extraHours: Math.max(0, salonConfig.extraHours - 1)})} className="flex-1 sm:w-12 h-full font-bold text-2xl hover:bg-gray-100 active:bg-gray-200 transition-colors border-r border-gray-200">-</button>
+                    <span className="w-16 text-center font-bold text-xl text-gray-900">{salonConfig.extraHours}</span>
+                    <button onClick={() => setSalonConfig({...salonConfig, extraHours: salonConfig.extraHours + 1})} className="flex-1 sm:w-12 h-full font-bold text-2xl hover:bg-gray-100 active:bg-gray-200 transition-colors border-l border-gray-200">+</button>
                   </div>
                 </div>
               </div>
@@ -480,37 +476,35 @@ export default function SalonView() {
                 </div>
               </div>
 
-{/* Reemplazo del cuadro de total en SalonView.jsx */}
-<div className="bg-[#2A2A2A] text-white p-10 text-center rounded-sm shadow-2xl">
-  <p className="text-xs text-gray-400 font-bold uppercase mb-4 tracking-widest">Costo Total Estimado</p>
-  <p className="font-serif text-6xl md:text-8xl text-gold font-bold mb-6">${totalEstimadoSalon()}</p>
-  
-  {/* LA NOTA QUE FALTABA */}
-  <div className="bg-black/40 border border-white/10 p-5 rounded-sm text-xs text-left flex gap-4 font-bold text-gray-300 leading-relaxed">
-    <Info className="w-6 h-6 text-gold flex-shrink-0" /> 
-    Una vez confirmada la disponibilidad de la fecha, se validará el precio final por WhatsApp.
-  </div>
+              {/* Botón WhatsApp Responsive */}
+              <div className="bg-[#2A2A2A] text-white p-10 text-center rounded-sm shadow-2xl">
+                <p className="text-xs text-gray-400 font-bold uppercase mb-4 tracking-widest">Costo Total Estimado</p>
+                <p className="font-serif text-6xl md:text-8xl text-gold font-bold mb-6">${totalEstimadoSalon()}</p>
+                
+                <div className="bg-black/40 border border-white/10 p-5 rounded-sm text-xs text-left flex gap-4 font-bold text-gray-300 leading-relaxed">
+                  <Info className="w-6 h-6 text-gold flex-shrink-0" /> 
+                  Una vez confirmada la disponibilidad de la fecha, se validará el precio final por WhatsApp.
+                </div>
 
-<button
-  onClick={sendWhatsAppSalon}
-  disabled={!isSalonFormValid}
-  // Añadimos clases para asegurar legibilidad en hover
-  className={`w-full py-6 text-lg font-bold uppercase tracking-widest flex justify-center items-center gap-4 transition-all shadow-xl rounded-sm mt-10 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 ${
-    isSalonFormValid
-      ? 'bg-[#25D366] text-white hover:bg-[#1DA851] transform hover:-translate-y-1'
-      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-  }`}
->
-  {isSalonFormValid ? (
-    <>
-      {/* Icono más grande y blanco para mejor contraste */}
-      <MessageCircle className="w-7 h-7 flex-shrink-0" /> Solicitar por WhatsApp
-    </>
-  ) : (
-    "Faltan datos de reserva"
-  )}
-</button>
-</div>
+                <button 
+                  onClick={sendWhatsAppSalon} 
+                  disabled={!isSalonFormValid} 
+                  className={`w-full py-4 md:py-6 px-4 text-sm md:text-lg font-bold uppercase tracking-[0.15em] flex justify-center items-center gap-3 transition-all shadow-xl rounded-sm mt-8 border-2 ${
+                    isSalonFormValid 
+                    ? 'bg-[#25D366] border-[#25D366] text-white hover:bg-[#1DA851] hover:border-[#1DA851] transform active:scale-95' 
+                    : 'bg-gray-200 border-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  {isSalonFormValid ? (
+                    <>
+                      <MessageCircle className="w-5 h-5 md:w-7 md:h-7 flex-shrink-0" />
+                      <span>Enviar por WhatsApp</span>
+                    </>
+                  ) : (
+                    "Faltan datos de reserva"
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -518,4 +512,3 @@ export default function SalonView() {
     </div>
   );
 }
-

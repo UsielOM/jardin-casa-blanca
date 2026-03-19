@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { 
   Tent, CheckCircle, MessageCircle, Info, 
-  User, Calendar as CalendarIcon, Users, ArrowRight 
+  User, Calendar as CalendarIcon, Users
 } from 'lucide-react';
 import { cabinData } from '../data/catalog';
 
@@ -44,7 +44,7 @@ export default function CabinView() {
 
   const sendCabinWhatsApp = () => {
     if (!isCabinFormValid) return;
-    const phone = "525523091732";
+    const phone = "525523091732"; // Tu número de teléfono
     window.open(`https://wa.me/${phone}?text=${generateCabinQuoteText()}`, '_blank');
   };
 
@@ -57,7 +57,7 @@ export default function CabinView() {
         {/* SECCIÓN SUPERIOR: INFO E IMAGEN */}
         <div className="flex flex-col lg:flex-row">
           <div className="lg:w-1/2 h-80 lg:h-auto bg-black">
-            <img src={cabinData.img} className="w-full h-full object-cover" alt="Cabaña VIP Jardín Casa Blanca" />
+            <img src={cabinData.img} className="w-full h-full object-cover" alt="Cabaña VIP Jardín Casa Blanca Necaxa" />
           </div>
           <div className="lg:w-1/2 bg-[#2A2A2A] text-white p-8 md:p-14">
             <div className="flex items-center gap-4 mb-6">
@@ -79,7 +79,7 @@ export default function CabinView() {
                  <strong className="text-gold">Horarios:</strong> {cabinData.schedule}
                </p>
                <p className="leading-relaxed">
-                 <strong className="text-gold uppercase tracking-widest block mb-1">Políticas e Inventario:</strong> 
+                 <strong className="text-gold uppercase tracking-widest block mb-1">Políticas:</strong> 
                  {cabinData.policy}
                </p>
             </div>
@@ -142,15 +142,24 @@ export default function CabinView() {
                   <label className="flex items-center gap-2 text-[10px] font-bold text-gray-400 mb-4 uppercase tracking-widest">
                     <Users className="w-4 h-4 text-gold" /> Huéspedes (Máximo 6 personas)
                   </label>
-                  <div className="flex items-center gap-6">
-                    <input 
-                      type="range" 
-                      min="1" max="6" 
-                      value={cabinConfig.guests} 
-                      onChange={e => setCabinConfig({...cabinConfig, guests: parseInt(e.target.value)})}
-                      className="flex-1 accent-gold"
-                    />
-                    <span className="text-4xl font-serif font-bold text-gray-900 w-12 text-center">{cabinConfig.guests}</span>
+                  
+                  {/* MEJORA 1: Cambiamos Slider por Botones +/- Responsive */}
+                  <div className="flex items-center border-2 border-gray-300 rounded bg-white overflow-hidden shadow-sm h-12 w-full sm:w-auto sm:max-w-[200px]">
+                    <button 
+                      onClick={() => setCabinConfig({...cabinConfig, guests: Math.max(1, cabinConfig.guests - 1)})}
+                      className="flex-1 sm:w-12 h-full font-bold text-2xl hover:bg-gray-100 active:bg-gray-200 transition-colors border-r border-gray-200 text-gold"
+                    >
+                      -
+                    </button>
+                    <span className="w-16 text-center font-bold text-xl text-gray-900">
+                      {cabinConfig.guests}
+                    </span>
+                    <button 
+                      onClick={() => setCabinConfig({...cabinConfig, guests: Math.min(6, cabinConfig.guests + 1)})}
+                      className="flex-1 sm:w-12 h-full font-bold text-2xl hover:bg-gray-100 active:bg-gray-200 transition-colors border-l border-gray-200 text-gold"
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
               </div>
@@ -186,16 +195,25 @@ export default function CabinView() {
                   </div>
                 </div>
 
+                {/* MEJORA 2: Botón de WhatsApp Responsive y Elegante */}
                 <button 
                   onClick={sendCabinWhatsApp} 
                   disabled={!isCabinFormValid} 
-                  className={`w-full py-6 text-lg font-bold uppercase tracking-[0.2em] flex justify-center items-center gap-4 transition-all shadow-2xl rounded-sm ${
+                  className={`w-full py-4 md:py-6 px-4 text-sm md:text-lg font-bold uppercase tracking-[0.15em] flex justify-center items-center gap-3 transition-all shadow-xl rounded-sm ${
                     isCabinFormValid 
-                    ? 'bg-[#25D366] text-white hover:bg-[#1DA851] transform hover:-translate-y-1' 
+                    ? 'bg-[#25D366] border-[#25D366] text-white hover:bg-[#1DA851] hover:border-[#1DA851] transform active:scale-95' 
                     : 'bg-gray-800 text-gray-600 cursor-not-allowed border border-white/5'
                   }`}
                 >
-                  {isCabinFormValid ? <><MessageCircle className="w-8 h-8" /> Reservar Ahora</> : 'Faltan Datos'}
+                  {isCabinFormValid ? (
+                    <>
+                      {/* Icono responsivo */}
+                      <MessageCircle className="w-5 h-5 md:w-7 md:h-7 flex-shrink-0" /> 
+                      <span>Reservar vía WhatsApp</span>
+                    </>
+                  ) : (
+                    "Faltan Datos obligatorios"
+                  )}
                 </button>
               </div>
             </div>
