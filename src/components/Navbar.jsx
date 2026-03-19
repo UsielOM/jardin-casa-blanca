@@ -1,6 +1,6 @@
 // src/components/Navbar.jsx
 import React from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronLeft } from 'lucide-react';
 
 export default function Navbar({ 
   scrolled, 
@@ -9,72 +9,111 @@ export default function Navbar({
   activeFlow, 
   onFlowSelect 
 }) {
+  // Enlaces rápidos para el flujo de Salón
+  const salonLinks = [
+    { name: 'Mobiliario', href: '#mesas' },
+    { name: 'Inflables', href: '#inflables' },
+    { name: 'Música', href: '#musica' },
+    { name: 'Cabaña', href: '#cabana' },
+  ];
+
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-white/95 py-4 md:py-6'}`}>
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${
+      scrolled ? 'bg-white shadow-md py-2' : 'bg-white/95 py-4'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 flex justify-between items-center">
-        {/* Logo / Nombre */}
+        
+        {/* LOGO */}
         <div 
-          className="text-xl md:text-3xl font-serif font-bold text-gold tracking-widest uppercase cursor-pointer" 
+          className="text-xl md:text-2xl font-serif font-bold text-gold uppercase tracking-tighter cursor-pointer flex items-center gap-2" 
           onClick={() => onFlowSelect('none')}
         >
+          {activeFlow !== 'none' && <ChevronLeft className="w-5 h-5 lg:hidden" />}
           Jardín Casa Blanca
         </div>
-        
-        {/* Menú Desktop */}
-        <div className="hidden lg:flex space-x-6 items-center text-sm font-bold tracking-wider text-gray-700">
+
+        {/* MENÚ DESKTOP */}
+        <div className="hidden lg:flex items-center space-x-8 text-[10px] font-bold text-gray-700 tracking-[0.2em]">
           {activeFlow === 'none' ? (
-            <span className="text-gold italic font-serif text-xl">Selecciona una experiencia</span>
+            <>
+              <button onClick={() => onFlowSelect('salon')} className="hover:text-gold transition-colors uppercase">Eventos</button>
+              <button onClick={() => onFlowSelect('cabana')} className="hover:text-gold transition-colors uppercase">Cabaña</button>
+            </>
           ) : (
             <>
-              <button onClick={() => onFlowSelect('none')} className="hover:text-gold transition-colors flex items-center gap-1">
-                ← INICIO
+              <button 
+                onClick={() => onFlowSelect('none')} 
+                className="text-gold hover:text-gray-900 transition-colors uppercase flex items-center gap-2"
+              >
+                <ChevronLeft className="w-4 h-4" /> INICIO
               </button>
-              {activeFlow === 'salon' && (
-                <>
-                  <a href="#mesas" className="hover:text-gold uppercase transition-colors">Mesas</a>
-                  <a href="#inflables" className="hover:text-gold uppercase transition-colors">Inflables</a>
-                  <a href="#musica" className="hover:text-gold uppercase transition-colors">Música</a>
-                  <a href="#cabana" className="hover:text-gold uppercase transition-colors">Cabaña</a>
-                  <a href="#cotizador" className="bg-gold text-white px-5 py-2 hover:bg-yellow-600 transition-colors shadow-sm">
-                    COTIZAR
-                  </a>
-                </>
-              )}
+              
+              {/* Links de secciones si estamos en Salón */}
+              {activeFlow === 'salon' && salonLinks.map(link => (
+                <a key={link.href} href={link.href} className="hover:text-gold transition-colors uppercase">
+                  {link.name}
+                </a>
+              ))}
+
+              <a 
+                href="#cotizador" 
+                className="bg-gold text-white px-6 py-2 hover:bg-gray-900 transition-all rounded-sm shadow-sm"
+              >
+                COTIZAR AHORA
+              </a>
             </>
           )}
         </div>
 
-        {/* Botón Móvil */}
+        {/* BOTÓN MÓVIL */}
         <button 
           onClick={() => setIsMenuOpen(!isMenuOpen)} 
-          className="lg:hidden text-gold p-1 focus:outline-none"
+          className="lg:hidden text-gold p-2"
         >
           {isMenuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
         </button>
       </div>
 
-      {/* Menú Móvil Desplegable */}
+      {/* MENÚ MÓVIL DESPLEGABLE */}
       {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-xl flex flex-col p-6 space-y-4 text-center border-t border-gray-100 fade-in">
-          {activeFlow !== 'none' && (
-            <button 
-              onClick={() => onFlowSelect('none')} 
-              className="text-gray-900 font-bold py-2 border-b border-gray-100"
-            >
-              ← VOLVER AL INICIO
-            </button>
-          )}
-          {activeFlow === 'salon' && (
-            <>
-              <a href="#mesas" onClick={() => setIsMenuOpen(false)} className="py-2 text-gray-700 font-bold">Mesas</a>
-              <a href="#inflables" onClick={() => setIsMenuOpen(false)} className="py-2 text-gray-700 font-bold">Inflables</a>
-              <a href="#musica" onClick={() => setIsMenuOpen(false)} className="py-2 text-gray-700 font-bold">Música</a>
-              <a href="#cabana" onClick={() => setIsMenuOpen(false)} className="py-2 text-gray-700 font-bold">Cabaña</a>
-              <a href="#cotizador" onClick={() => setIsMenuOpen(false)} className="bg-gold text-white font-bold py-4 rounded-sm shadow-md">
-                IR AL COTIZADOR
-              </a>
-            </>
-          )}
+        <div className="lg:hidden bg-white border-t border-gray-100 shadow-2xl fade-in overflow-y-auto max-h-screen">
+          <div className="flex flex-col p-8 space-y-6 text-center">
+            {activeFlow !== 'none' && (
+              <button 
+                onClick={() => onFlowSelect('none')} 
+                className="text-gold font-bold uppercase tracking-widest text-sm border-b pb-4"
+              >
+                ← VOLVER AL MENÚ PRINCIPAL
+              </button>
+            )}
+
+            {activeFlow === 'salon' ? (
+              <>
+                {salonLinks.map(link => (
+                  <a 
+                    key={link.href} 
+                    href={link.href} 
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-gray-800 font-bold uppercase tracking-widest text-sm"
+                  >
+                    {link.name}
+                  </a>
+                ))}
+                <a 
+                  href="#cotizador" 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="bg-gold text-white py-5 rounded-sm font-bold uppercase tracking-[0.2em] shadow-lg"
+                >
+                  VER MI COTIZACIÓN
+                </a>
+              </>
+            ) : (
+              <>
+                <button onClick={() => onFlowSelect('salon')} className="text-gray-800 font-bold uppercase tracking-widest text-sm">Salón de Eventos</button>
+                <button onClick={() => onFlowSelect('cabana')} className="text-gray-800 font-bold uppercase tracking-widest text-sm">Cabaña VIP</button>
+              </>
+            )}
+          </div>
         </div>
       )}
     </nav>
