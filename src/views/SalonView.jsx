@@ -2,7 +2,7 @@
 import React, { useState, useRef } from "react";
 import {
   CheckCircle, ChevronLeft, ChevronRight, Clock, Info, User, Tag,
-  Calendar as CalendarIcon, MessageCircle, Play, Sparkles, Plus, Minus, Tent
+  Calendar as CalendarIcon, MessageCircle, Play, Sparkles, Plus, Minus, Tent, Palette
 } from "lucide-react";
 import {
   tablesData,
@@ -12,22 +12,29 @@ import {
   cabinData,
 } from "../data/catalog";
 
+// Lista de colores disponibles para cubre manteles
+const CUBRE_COLORS = [
+  "Rojo", "Rosa Mexicano", "Palo de Rosa", "Azul Cielo", 
+  "Azul Rey", "Amarillo Girasol", "Vino", "Menta", "Tenangos"
+];
+
 export default function SalonView() {
   // --- ESTADOS ---
   const [clientDetails, setClientDetails] = useState({ name: "", eventType: "" });
   const [eventDate, setEventDate] = useState("");
   const [activeProviderIndex, setActiveProviderIndex] = useState(0);
   const [salonConfig, setSalonConfig] = useState({ extraHours: 0 });
+  
   const [selections, setSelections] = useState({
     tables: {
-      t1: { active: false, mantelQty: 0, cubreQty: 0 },
-      t2: { active: false, mantelQty: 0, cubreQty: 0 },
+      t1: { active: false, mantelQty: 0, cubreQty: 0, cubreColor: "Rojo" },
+      t2: { active: false, mantelQty: 0, cubreQty: 0, cubreColor: "Rojo" },
     },
     inflatables: [],
     music: [], 
   });
+  
   const [cabinConfig, setCabinConfig] = useState({ rent: false, checkIn: "", checkOut: "", guests: 2 });
-
   const [musicTab, setMusicTab] = useState("sounds");
   const [currentMusicIndex, setCurrentMusicIndex] = useState(0);
   const [showMusicPackages, setShowMusicPackages] = useState(false);
@@ -39,7 +46,7 @@ export default function SalonView() {
   const toggleTableConfig = (id) => {
     setSelections((prev) => {
       const active = prev.tables[id].active;
-      if (active) return { ...prev, tables: { ...prev.tables, [id]: { active: false, mantelQty: 0, cubreQty: 0 } } };
+      if (active) return { ...prev, tables: { ...prev.tables, [id]: { active: false, mantelQty: 0, cubreQty: 0, cubreColor: "Rojo" } } };
       return { ...prev, tables: { ...prev.tables, [id]: { ...prev.tables[id], active: true, mantelQty: prev.tables[id].mantelQty === 0 ? 1 : prev.tables[id].mantelQty } } };
     });
   };
@@ -50,6 +57,13 @@ export default function SalonView() {
       const newConfig = { ...prev.tables[id], [field]: newQty };
       return { ...prev, tables: { ...prev.tables, [id]: { ...newConfig, active: (newConfig.mantelQty + newConfig.cubreQty) > 0 } } };
     });
+  };
+
+  const updateTableColor = (id, color) => {
+    setSelections(prev => ({
+      ...prev,
+      tables: { ...prev.tables, [id]: { ...prev.tables[id], cubreColor: color } }
+    }));
   };
 
   const toggleMusicPackage = (provider, pkg) => {
@@ -111,17 +125,15 @@ export default function SalonView() {
       if (t.active) {
         const d = tablesData.find((x) => x.id === k);
         if (t.mantelQty > 0) msg += `🪑 ${t.mantelQty}x ${d.name} (Mantel) - $${t.mantelQty * 100} MXN\n`;
-        if (t.cubreQty > 0) msg += `🪑 ${t.cubreQty}x ${d.name} (Cubre) - $${t.cubreQty * 110} MXN\n`;
+        if (t.cubreQty > 0) msg += `🪑 ${t.cubreQty}x ${d.name} (Cubre Color: ${t.cubreColor}) - $${t.cubreQty * 110} MXN\n`;
       }
     });
 
     selections.inflatables.forEach((i) => (msg += `🎈 ${i.name} - $${i.price} MXN\n`));
     selections.music.forEach((m) => (msg += `🎵 ${m.providerName}: ${m.packageName} - $${m.price} MXN\n`));
-
-    if (cabinConfig.rent) msg += `🏡 Cabaña VIP (${getCabinNights()} noches, ${cabinConfig.guests} pers.) - $${cabinData.price * cabinConfig.guests * getCabinNights()} MXN\n`;
+    if (cabinConfig.rent) msg += `🏡 Cabaña VIP (${getCabinNights()} noches) - $${cabinData.price * cabinConfig.guests * getCabinNights()} MXN\n`;
 
     msg += `\n💰 *COSTO TOTAL ESTIMADO:* $${totalEstimadoSalon()} MXN\n`;
-    msg += `\nℹ️ Una vez confirmada la disponibilidad de la fecha, se validará el precio final por WhatsApp.`;
     return encodeURIComponent(msg);
   };
 
@@ -141,7 +153,7 @@ export default function SalonView() {
           <div className="absolute inset-0 bg-black/60"></div>
         </div>
         <div className="relative text-white max-w-4xl">
-          <h1 className="font-serif text-5xl md:text-9xl font-bold mb-4 uppercase tracking-tighter">Tu Evento Ideal</h1>
+          <h1 className="font-serif text-5xl md:text-9xl font-bold mb-4 uppercase tracking-tighter text-shadow-xl">Tu Evento Ideal</h1>
           <p className="text-lg md:text-2xl font-medium opacity-80 uppercase tracking-widest">Jardín Casa Blanca Necaxa</p>
         </div>
       </header>
@@ -154,49 +166,54 @@ export default function SalonView() {
             {tablesData.map((table) => {
               const t = selections.tables[table.id];
               return (
-                <div key={table.id} className={`bg-white border-2 rounded-sm overflow-hidden transition-all duration-500 ${t.active ? "border-gold shadow-2xl scale-[1.05]" : "border-gray-200"}`}>
+                <div key={table.id} className={`bg-white border-2 rounded-sm overflow-hidden transition-all duration-500 ${t.active ? "border-gold shadow-2xl scale-[1.02]" : "border-gray-200"}`}>
                   <img src={table.img} className="w-full h-64 object-cover" alt={table.name} />
                   <div className="p-8 text-center">
-                    <h3 className="font-serif text-3xl font-bold mb-3">{table.name}</h3>
+                    <h3 className="font-serif text-3xl font-bold mb-3 uppercase tracking-tight">{table.name}</h3>
                     <p className="text-gray-600 mb-8 font-medium">{table.desc}</p>
                     <button onClick={() => toggleTableConfig(table.id)} className={`w-full py-4 rounded-sm text-sm font-bold uppercase transition-all mb-8 ${t.active ? "bg-gold text-white" : "border-2 border-gray-400"}`}>
                       {t.active ? "✓ Seleccionada" : "Seleccionar este tipo"}
                     </button>
-<div className="space-y-4 pt-6 border-t border-gray-100">
-  {[ 
-    {f:'mantelQty', l:'CON MANTEL', p:100}, 
-    {f:'cubreQty', l:'CON CUBRE MANTEL', p:110} 
-  ].map(field => (
-    <div key={field.f} className="flex justify-between items-center bg-gray-50 p-3 sm:p-4 rounded border gap-2">
-      {/* Contenedor de Texto: flex-1 y min-w-0 para que el texto no empuje al contador */}
-      <div className="text-left min-w-0 flex-1">
-        <p className="font-bold text-gray-800 text-xs sm:text-sm truncate sm:whitespace-normal uppercase tracking-tight">
-          {field.l}
-        </p>
-        <p className="text-[10px] text-gray-500">${field.p} c/u</p>
-      </div>
+                    
+                    {/* Campos de Configuración de Mesas */}
+                    <div className="space-y-4 pt-6 border-t border-gray-100">
+                      {[ 
+                        {f:'mantelQty', l:'CON MANTEL', p:100}, 
+                        {f:'cubreQty', l:'CON CUBRE MANTEL', p:110} 
+                      ].map(field => (
+                        <div key={field.f} className="flex flex-col gap-3 bg-gray-50 p-3 sm:p-4 rounded border border-gray-200">
+                          <div className="flex justify-between items-center gap-2">
+                            <div className="text-left min-w-0 flex-1">
+                              <p className="font-bold text-gray-800 text-xs sm:text-sm uppercase tracking-tight">{field.l}</p>
+                              <p className="text-[10px] text-gray-500 font-bold">${field.p} c/u</p>
+                            </div>
+                            <div className="flex items-center border rounded bg-white overflow-hidden shadow-sm flex-shrink-0 h-10 border-gray-300">
+                              <button onClick={() => updateTableQtyConfig(table.id, field.f, -1)} className="px-3 sm:px-5 py-1 font-bold text-lg text-gold hover:bg-gray-100">-</button>
+                              <span className="w-8 sm:w-10 text-center font-bold text-gray-900 text-sm">{t[field.f]}</span>
+                              <button onClick={() => updateTableQtyConfig(table.id, field.f, 1)} className="px-3 sm:px-5 py-1 font-bold text-lg text-gold hover:bg-gray-100">+</button>
+                            </div>
+                          </div>
 
-      {/* Contador: flex-shrink-0 para que nunca se haga más pequeño de lo necesario */}
-      <div className="flex items-center border rounded bg-white overflow-hidden shadow-sm flex-shrink-0 h-10 border-gray-300">
-        <button 
-          onClick={() => updateTableQtyConfig(table.id, field.f, -1)} 
-          className="px-3 sm:px-5 py-1 sm:py-2 font-bold text-lg sm:text-xl hover:bg-gray-100 active:bg-gray-200 transition-colors text-gold"
-        >
-          -
-        </button>
-        <span className="w-8 sm:w-10 text-center font-bold text-gray-900 text-sm sm:text-base border-x border-gray-100">
-          {t[field.f]}
-        </span>
-        <button 
-          onClick={() => updateTableQtyConfig(table.id, field.f, 1)} 
-          className="px-3 sm:px-5 py-1 sm:py-2 font-bold text-lg sm:text-xl hover:bg-gray-100 active:bg-gray-200 transition-colors text-gold"
-        >
-          +
-        </button>
-      </div>
-    </div>
-  ))}
-</div>
+                          {/* Selector de Color Mejorado */}
+                          {field.f === 'cubreQty' && t.cubreQty > 0 && (
+                            <div className="pt-2 border-t border-gray-200 mt-1 animate-fade-in">
+                              <label className="flex items-center gap-2 text-[10px] font-bold text-gold mb-2 uppercase tracking-widest">
+                                <Palette className="w-3 h-3" /> Elige un color para el cubre
+                              </label>
+                              <select 
+                                value={t.cubreColor} 
+                                onChange={(e) => updateTableColor(table.id, e.target.value)}
+                                className="w-full bg-white border-2 border-gray-200 p-2 rounded-sm text-xs font-bold text-gray-700 outline-none focus:border-gold transition-colors cursor-pointer"
+                              >
+                                {CUBRE_COLORS.map(color => (
+                                  <option key={color} value={color}>{color}</option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               );
@@ -243,9 +260,9 @@ export default function SalonView() {
           <h2 className="font-serif text-4xl md:text-6xl text-gold text-center font-bold mb-12 uppercase tracking-tighter text-shadow-lg">Entretenimiento Musical</h2>
           
           <div className="flex justify-center mb-16">
-            <div className="bg-gray-800 p-1 rounded-full flex">
-              <button onClick={() => { setMusicTab('sounds'); setCurrentMusicIndex(0); setShowMusicPackages(false); }} className={`px-8 py-3 rounded-full font-bold text-sm transition-all uppercase tracking-widest ${musicTab === 'sounds' ? 'bg-gold text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}>Sonidos y DJs</button>
-              <button onClick={() => { setMusicTab('bands'); setCurrentMusicIndex(0); setShowMusicPackages(false); }} className={`px-8 py-3 rounded-full font-bold text-sm transition-all uppercase tracking-widest ${musicTab === 'bands' ? 'bg-gold text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}>Grupos Musicales</button>
+            <div className="bg-gray-800 p-1 rounded-full flex shadow-2xl">
+              <button onClick={() => { setMusicTab('sounds'); setCurrentMusicIndex(0); setShowMusicPackages(false); }} className={`px-8 py-3 rounded-full font-bold text-xs transition-all uppercase tracking-widest ${musicTab === 'sounds' ? 'bg-gold text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}>Sonidos y DJs</button>
+              <button onClick={() => { setMusicTab('bands'); setCurrentMusicIndex(0); setShowMusicPackages(false); }} className={`px-8 py-3 rounded-full font-bold text-xs transition-all uppercase tracking-widest ${musicTab === 'bands' ? 'bg-gold text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}>Grupos Musicales</button>
             </div>
           </div>
 
@@ -257,7 +274,7 @@ export default function SalonView() {
               <div className="lg:col-span-5 space-y-6">
                 <div>
                   <span className="text-gold font-bold text-[10px] uppercase tracking-[0.3em] flex items-center gap-2 mb-2"><Sparkles className="w-3 h-3" /> {currentArtist.type}</span>
-                  <h3 className="font-serif text-5xl md:text-6xl font-bold leading-none">{currentArtist.name}</h3>
+                  <h3 className="font-serif text-5xl md:text-6xl font-bold leading-none uppercase tracking-tighter">{currentArtist.name}</h3>
                 </div>
                 <p className="text-gray-300 text-lg leading-relaxed font-medium">{currentArtist.description}</p>
                 <button onClick={() => setShowMusicPackages(!showMusicPackages)} className={`w-full py-5 rounded-sm font-bold uppercase tracking-widest transition-all border-2 flex items-center justify-center gap-3 ${showMusicPackages ? 'bg-white text-gray-900 border-white' : 'border-gold text-gold hover:bg-gold hover:text-white'}`}>
@@ -320,9 +337,7 @@ export default function SalonView() {
               <Tent className="w-10 h-10 text-gold" />
               <h2 className="font-serif text-4xl md:text-5xl text-gold font-bold uppercase tracking-tight">Cabaña VIP (Adicional)</h2>
             </div>
-            
             <p className="text-gray-200 mb-8 text-lg font-medium leading-relaxed font-serif">{cabinData.desc}</p>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-300 mb-10 font-bold">
               {cabinData.amenities.map((a, i) => (
                 <li key={i} className="flex gap-2 items-center">
@@ -330,7 +345,6 @@ export default function SalonView() {
                 </li>
               ))}
             </div>
-
             <div className="bg-white/5 border border-white/10 p-6 text-xs font-medium leading-relaxed rounded mb-10 text-gray-300">
               <p className="mb-4 uppercase tracking-widest border-b border-white/10 pb-2"><strong className="text-gold">Horarios:</strong> {cabinData.schedule}</p>
               <p className="leading-relaxed"><strong className="text-gold uppercase tracking-widest block mb-1">Políticas:</strong> {cabinData.policy}</p>
@@ -339,52 +353,32 @@ export default function SalonView() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
               <div><label className="block text-[10px] font-bold text-gray-400 mb-2 uppercase">Entrada</label><input type="date" value={cabinConfig.checkIn} onChange={e => setCabinConfig({...cabinConfig, checkIn: e.target.value})} className="w-full bg-transparent border-b-2 border-gray-600 pb-2 text-white focus:border-gold outline-none text-sm transition-all" /></div>
               <div><label className="block text-[10px] font-bold text-gray-400 mb-2 uppercase">Salida</label><input type="date" value={cabinConfig.checkOut} onChange={e => setCabinConfig({...cabinConfig, checkOut: e.target.value})} className="w-full bg-transparent border-b-2 border-gray-600 pb-2 text-white focus:border-gold outline-none text-sm transition-all" /></div>
-             <div className="w-full">
-  <label className="block text-[10px] font-bold text-gray-400 mb-3 uppercase tracking-widest text-center sm:text-left">
-    Huéspedes (Máx. 6)
-  </label>
-  <div className="flex items-center border-2 border-gray-600 rounded bg-transparent overflow-hidden h-12 w-full">
-    <button 
-      onClick={() => setCabinConfig({...cabinConfig, guests: Math.max(1, cabinConfig.guests - 1)})}
-      className="flex-1 h-full font-bold text-2xl text-gold hover:bg-white/5 active:bg-white/10 transition-colors border-r border-gray-600"
-    >
-      -
-    </button>
-    <span className="w-16 text-center font-bold text-xl text-white">
-      {cabinConfig.guests}
-    </span>
-    <button 
-      onClick={() => setCabinConfig({...cabinConfig, guests: Math.min(6, cabinConfig.guests + 1)})}
-      className="flex-1 h-full font-bold text-2xl text-gold hover:bg-white/5 active:bg-white/10 transition-colors border-l border-gray-600"
-    >
-      +
-    </button>
-  </div>
-</div>            </div>
-
-            {/* Subtotal Cabaña con Desglose */}
-            <div className="bg-black/40 p-8 rounded-sm mb-8 border border-white/10 shadow-inner">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 pb-6 border-b border-white/5">
-                <div className="text-left">
-                  <p className="text-[10px] text-gold font-bold uppercase tracking-[0.2em] mb-1">Precio Base</p>
-                  <p className="text-2xl font-serif font-bold">${cabinData.price} <span className="text-xs text-gray-400 uppercase font-sans">MXN por persona / noche</span></p>
-                </div>
-                <div className="text-center md:text-right">
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Tu selección</p>
-                  <p className="text-sm font-bold text-gray-200 uppercase tracking-tighter">{cabinConfig.guests} Pers. × {getCabinNights()} Noches</p>
-                </div>
-              </div>
-              <p className="text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-widest text-center">Subtotal Estancia</p>
-              <div className="flex flex-col items-center">
-                <p className="font-serif text-5xl text-gold font-bold tracking-tighter">${cabinData.price * cabinConfig.guests * getCabinNights()} MXN</p>
-                <div className="mt-6 flex items-start gap-3 text-left bg-white/5 p-4 rounded-sm border border-white/5 w-full">
-                  <Info className="w-5 h-5 text-gold flex-shrink-0" />
-                  <p className="text-[11px] text-gray-400 leading-relaxed">Multiplicamos el costo de <span className="text-gold">${cabinData.price}</span> por el número de huéspedes (<span className="text-white">{cabinConfig.guests}</span>) y luego por el total de noches (<span className="text-white">{getCabinNights()}</span>).</p>
+              
+              {/* Selector de Huéspedes Mejorado */}
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 mb-3 uppercase tracking-widest">Huéspedes (Máx. 6)</label>
+                <div className="flex items-center border-2 border-gray-600 rounded bg-transparent overflow-hidden h-10 w-full">
+                  <button onClick={() => setCabinConfig({...cabinConfig, guests: Math.max(1, cabinConfig.guests - 1)})} className="flex-1 h-full font-bold text-xl text-gold hover:bg-white/5">-</button>
+                  <span className="w-10 text-center font-bold text-white text-sm">{cabinConfig.guests}</span>
+                  <button onClick={() => setCabinConfig({...cabinConfig, guests: Math.min(6, cabinConfig.guests + 1)})} className="flex-1 h-full font-bold text-xl text-gold hover:bg-white/5">+</button>
                 </div>
               </div>
             </div>
 
-            <button onClick={() => setCabinConfig(prev => ({...prev, rent: !prev.rent}))} className={`w-full py-5 text-base font-bold uppercase border-2 transition-all ${cabinConfig.rent ? 'bg-gold border-gold text-white shadow-lg' : 'border-gold text-gold hover:bg-gold hover:text-white'}`}>
+            <div className="bg-black/40 p-8 rounded-sm mb-8 border border-white/10 shadow-inner">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 pb-6 border-b border-white/5">
+                <div className="text-left">
+                  <p className="text-[10px] text-gold font-bold uppercase tracking-[0.2em] mb-1">Precio Base</p>
+                  <p className="text-2xl font-serif font-bold">${cabinData.price} <span className="text-[10px] text-gray-400 uppercase font-sans">por pers. / noche</span></p>
+                </div>
+                <div className="text-center md:text-right">
+                  <p className="text-sm font-bold text-gray-200 uppercase tracking-tighter">{cabinConfig.guests} Pers. × {getCabinNights()} Noches</p>
+                </div>
+              </div>
+              <p className="font-serif text-5xl text-gold font-bold tracking-tighter text-center">${cabinData.price * cabinConfig.guests * getCabinNights()} MXN</p>
+            </div>
+
+            <button onClick={() => setCabinConfig(prev => ({...prev, rent: !prev.rent}))} className={`w-full py-5 text-xs font-bold uppercase border-2 transition-all tracking-widest ${cabinConfig.rent ? 'bg-gold border-gold text-white shadow-lg' : 'border-gold text-gold hover:bg-gold hover:text-white'}`}>
               {cabinConfig.rent ? '✓ AGREGADA A LA COTIZACIÓN' : 'AGREGAR CABAÑA AL EVENTO'}
             </button>
           </div>
@@ -409,17 +403,12 @@ export default function SalonView() {
               
               <div className="bg-gray-50 p-8 border-2 border-gray-200 rounded-sm space-y-6">
                 <div className="flex items-center gap-4 border-b-2 border-gray-200 pb-5"><CheckCircle className="w-8 h-8 text-gold" /><span className="font-serif text-3xl font-bold">Base Salón (6h) - $2,500</span></div>
-                
-                {/* Horas Extra Responsive */}
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pt-6 border-t border-gray-200">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-gold" />
-                    <span className="font-bold text-xs uppercase tracking-widest text-gray-500">Horas Extra ($250/h):</span>
-                  </div>
+                  <div className="flex items-center gap-2"><Clock className="w-5 h-5 text-gold" /><span className="font-bold text-xs uppercase tracking-widest text-gray-500">Horas Extra ($250/h):</span></div>
                   <div className="flex items-center border-2 border-gray-300 rounded bg-white overflow-hidden shadow-sm h-12 w-full sm:w-auto">
-                    <button onClick={() => setSalonConfig({...salonConfig, extraHours: Math.max(0, salonConfig.extraHours - 1)})} className="flex-1 sm:w-12 h-full font-bold text-2xl hover:bg-gray-100 active:bg-gray-200 transition-colors border-r border-gray-200">-</button>
+                    <button onClick={() => setSalonConfig({...salonConfig, extraHours: Math.max(0, salonConfig.extraHours - 1)})} className="flex-1 sm:w-12 h-full font-bold text-2xl hover:bg-gray-100">-</button>
                     <span className="w-16 text-center font-bold text-xl text-gray-900">{salonConfig.extraHours}</span>
-                    <button onClick={() => setSalonConfig({...salonConfig, extraHours: salonConfig.extraHours + 1})} className="flex-1 sm:w-12 h-full font-bold text-2xl hover:bg-gray-100 active:bg-gray-200 transition-colors border-l border-gray-200">+</button>
+                    <button onClick={() => setSalonConfig({...salonConfig, extraHours: salonConfig.extraHours + 1})} className="flex-1 sm:w-12 h-full font-bold text-2xl hover:bg-gray-100">+</button>
                   </div>
                 </div>
               </div>
@@ -432,77 +421,41 @@ export default function SalonView() {
                    <p className="flex justify-between items-center text-xs"><span>RENTA BASE SALÓN</span> <span>$2,500 MXN</span></p>
                    {salonConfig.extraHours > 0 && <p className="flex justify-between items-center text-xs"><span>HORAS EXTRA ({salonConfig.extraHours}h)</span> <span>${salonConfig.extraHours * 250} MXN</span></p>}
                    
-                   {/* Mesas */}
-                   {Object.keys(selections.tables).some(k => selections.tables[k].active) && (
-                     <div className="pt-4 border-t border-gray-200">
-                       <p className="text-[10px] text-gold uppercase mb-3 tracking-widest">MOBILIARIO</p>
-                       {Object.keys(selections.tables).map(k => {
-                         const t = selections.tables[k];
-                         if (!t.active) return null;
-                         const d = tablesData.find(x => x.id === k);
-                         return (
-                           <div key={k} className="space-y-2 mb-3">
-                             {t.mantelQty > 0 && <div className="flex justify-between items-center ml-2"><span>{t.mantelQty}x {d.name} (Mantel)</span> <span>${t.mantelQty * 100}</span></div>}
-                             {t.cubreQty > 0 && <div className="flex justify-between items-center ml-2"><span>{t.cubreQty}x {d.name} (Cubre)</span> <span>${t.cubreQty * 110}</span></div>}
-                           </div>
-                         );
-                       })}
-                     </div>
-                   )}
+                   {/* Mesas en Resumen */}
+                   {Object.keys(selections.tables).map(k => {
+                     const t = selections.tables[k];
+                     if (!t.active) return null;
+                     const d = tablesData.find(x => x.id === k);
+                     return (
+                       <div key={k} className="pt-4 border-t border-gray-200 space-y-2">
+                         <p className="text-[10px] text-gold uppercase tracking-widest">Mobiliario: {d.name}</p>
+                         {t.mantelQty > 0 && <div className="flex justify-between items-center ml-2"><span>{t.mantelQty}x Mantel</span> <span>${t.mantelQty * 100}</span></div>}
+                         {t.cubreQty > 0 && <div className="flex justify-between items-center ml-2"><span>{t.cubreQty}x Cubre ({t.cubreColor})</span> <span>${t.cubreQty * 110}</span></div>}
+                       </div>
+                     );
+                   })}
 
-                   {/* Inflables */}
-                   {selections.inflatables.length > 0 && (
-                     <div className="pt-4 border-t border-gray-200">
-                       <p className="text-[10px] text-gold uppercase mb-3 tracking-widest">INFLABLES</p>
-                       {selections.inflatables.map(i => <div key={i.id} className="flex justify-between items-center ml-2 mb-1"><span>{i.name}</span> <span>${i.price}</span></div>)}
-                     </div>
-                   )}
-
-                   {/* Música */}
-                   {selections.music.length > 0 && (
-                     <div className="pt-4 border-t border-gray-200">
-                       <p className="text-[10px] text-gold uppercase mb-3 tracking-widest">MÚSICA</p>
-                       {selections.music.map(m => <div key={m.packageId} className="flex justify-between items-center ml-2 mb-1"><span>{m.providerName} - {m.packageName}</span> <span>${m.price}</span></div>)}
-                     </div>
-                   )}
-
-                   {/* Cabaña */}
-                   {cabinConfig.rent && (
-                     <div className="pt-4 border-t border-gold/20 bg-gold/5 p-4 rounded mt-4">
-                       <p className="text-[10px] text-gold uppercase mb-2 tracking-widest">ESTANCIA CABAÑA VIP</p>
-                       <div className="flex justify-between items-center"><span>{getCabinNights()} Noche(s) / {cabinConfig.guests} Pers.</span> <span>${cabinData.price * cabinConfig.guests * getCabinNights()} MXN</span></div>
-                     </div>
-                   )}
+                   {/* Otros servicios */}
+                   {selections.inflatables.map(i => <div key={i.id} className="pt-4 border-t border-gray-200 flex justify-between items-center text-xs"><span>🎈 {i.name}</span> <span>${i.price}</span></div>)}
+                   {selections.music.map(m => <div key={m.packageId} className="pt-4 border-t border-gray-200 flex justify-between items-center text-xs"><span>🎵 {m.providerName}: {m.packageName}</span> <span>${m.price}</span></div>)}
+                   {cabinConfig.rent && <div className="pt-4 border-t border-gold/20 bg-gold/5 p-4 rounded mt-4 flex justify-between items-center font-bold"><span>🏡 Cabaña VIP ({getCabinNights()} Noches)</span> <span>${cabinData.price * cabinConfig.guests * getCabinNights()}</span></div>}
                 </div>
               </div>
 
-              {/* Botón WhatsApp Responsive */}
               <div className="bg-[#2A2A2A] text-white p-10 text-center rounded-sm shadow-2xl">
                 <p className="text-xs text-gray-400 font-bold uppercase mb-4 tracking-widest">Costo Total Estimado</p>
                 <p className="font-serif text-6xl md:text-8xl text-gold font-bold mb-6">${totalEstimadoSalon()}</p>
-                
                 <div className="bg-black/40 border border-white/10 p-5 rounded-sm text-xs text-left flex gap-4 font-bold text-gray-300 leading-relaxed">
-                  <Info className="w-6 h-6 text-gold flex-shrink-0" /> 
-                  Una vez confirmada la disponibilidad de la fecha, se validará el precio final por WhatsApp.
+                  <Info className="w-6 h-6 text-gold flex-shrink-0" /> Una vez confirmada la disponibilidad de la fecha, se validará el precio final por WhatsApp.
                 </div>
-
                 <button 
                   onClick={sendWhatsAppSalon} 
                   disabled={!isSalonFormValid} 
                   className={`w-full py-4 md:py-6 px-4 text-sm md:text-lg font-bold uppercase tracking-[0.15em] flex justify-center items-center gap-3 transition-all shadow-xl rounded-sm mt-8 border-2 ${
-                    isSalonFormValid 
-                    ? 'bg-[#25D366] border-[#25D366] text-white hover:bg-[#1DA851] hover:border-[#1DA851] transform active:scale-95' 
-                    : 'bg-gray-200 border-gray-200 text-gray-400 cursor-not-allowed'
+                    isSalonFormValid ? 'bg-[#25D366] border-[#25D366] text-white hover:bg-[#1DA851]' : 'bg-gray-200 border-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                 >
-                  {isSalonFormValid ? (
-                    <>
-                      <MessageCircle className="w-5 h-5 md:w-7 md:h-7 flex-shrink-0" />
-                      <span>Enviar por WhatsApp</span>
-                    </>
-                  ) : (
-                    "Faltan datos de reserva"
-                  )}
+                  {isSalonFormValid ? <><MessageCircle className="w-7 h-7" /> Enviar por WhatsApp</> : "Faltan datos de reserva"}
                 </button>
               </div>
             </div>

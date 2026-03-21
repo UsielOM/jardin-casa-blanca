@@ -86,14 +86,27 @@ export const inflatablesProviders = [
 // --- MÚSICA ---
 export const soundData = [
   {
-    id: 's1',
-    type: 'Sonidero / DJ',
-    name: 'Master Mix Sonidero',
-    mainVideo: 'https://player.vimeo.com/external/517090081.hd.mp4?s=913d80a133d5966d5b0665d5edcd5da69f3bd0fc&profile_id=175',
-    description: 'La mejor iluminación y mezclas en vivo para que nadie se quede sentado.',
+    id: 's2', // Proveedor 2
+    type: 'Show y Animación',
+    name: 'Producciones Kalex',
+    // Video Principal (El que más te guste de los 4)
+    mainVideo: 'https://res.cloudinary.com/dnopl3t98/video/upload/v1773901241/4_swdkke.mp4', 
+    description: 'Animación total para tu evento: desde shows de personajes hasta momentos emotivos de boda.',
     packages: [
-      { id: 's1-p1', name: 'Paquete Básico', price: 3500, video: 'https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ca2a8ebfae0e536bf301ebc1&profile_id=164', includes: ['5 horas de servicio', 'Audio profesional', 'Luces LED'] },
-      { id: 's1-p2', name: 'Paquete VIP Pro', price: 5500, video: 'https://player.vimeo.com/external/517090081.hd.mp4?s=913d80a133d5966d5b0665d5edcd5da69f3bd0fc&profile_id=175', includes: ['6 horas de servicio', 'Pantalla gigante', 'Humo'] }
+      { 
+        id: 's2-p1', 
+        name: 'Show de Personajes (Pikachu)', 
+        price: 2500, 
+        video: 'https://res.cloudinary.com/dnopl3t98/video/upload/v1773901235/3_vabudx.mp4', 
+        includes: ['Botarga profesional', 'Animador', 'Dinámicas con invitados'] 
+      },
+      { 
+        id: 's2-p2', 
+        name: 'Cobertura de Evento Especial', 
+        price: 4500, 
+        video: 'https://res.cloudinary.com/dnopl3t98/video/upload/v1773901238/1_pf4tuy.mp4', 
+        includes: ['Momentos destacados', 'Música temática', 'Coordinación total'] 
+      }
     ]
   }
 ];
