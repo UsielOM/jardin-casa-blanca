@@ -2,7 +2,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   CheckCircle, ChevronLeft, ChevronRight, Clock, Info, User, Tag,
-  Calendar as CalendarIcon, MessageCircle, Play, Sparkles, Plus, Minus, Tent, Palette, X, Music, Search, Trophy
+  Calendar as CalendarIcon, MessageCircle, Play, Sparkles, Plus, Minus, Tent, Palette, X, Music, Search, Trophy,
+  Cookie, Coffee
 } from "lucide-react";
 import {
   tablesData,
@@ -17,8 +18,113 @@ const CUBRE_COLORS = [
   "Azul Rey", "Amarillo Girasol", "Vino", "Menta", "Tenangos"
 ];
 
+const SNACKS_OPTS = {
+  botanas: ["Papas naturales", "Papas Flamin hot", "Papas Con queso", "Chicharrón ventana", "Chicharrón rueda"],
+  gomitas: ["Panditas", "Viborita", "Enchiladas", "Frutita", "Normales", "Donitas"],
+  semillas: ["Cacahuates japoneses", "Cacahuates salados", "Cacahuates enchilados"]
+};
+
+const HOTCAKES_OPTS = {
+  liquidos: ["Lechera", "Chocolate", "Cajeta", "Crema de avellana", "Mermelada", "Miel"],
+  granel: ["Chispas colores", "Chispas de chocolate", "Chispas chocolate blanco", "Granola"],
+  galletas: ["Galletas chocolate", "Galletas de bombón", "Galletas chokis"],
+  fruta: ["Uvas", "Fresa", "Durazno", "Platano"]
+};
+
+// --- COMPONENTE MODAL DE MÚSICA ---
+const MusicDetailsModal = ({ data, onClose, onSelect, isSelected }) => {
+  const [canLoadVideo, setCanLoadVideo] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setCanLoadVideo(true), 350);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!data) return null;
+  const { provider, package: pkg } = data;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-10 bg-black/95 animate-fade-in transform-gpu" onClick={onClose}>
+      <div 
+        className="relative bg-[#1A1A1A] text-white border border-gold/30 rounded-sm shadow-2xl w-full max-w-5xl max-h-[95vh] flex flex-col animate-pop-in overflow-hidden transform-gpu" 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6 md:p-8 border-b border-white/10 flex justify-between items-center bg-[#1A1A1A] sticky top-0 z-10">
+          <div className="flex items-center gap-4">
+            <Trophy className="w-6 h-6 text-gold" />
+            <div>
+              <h3 className="font-serif text-xl md:text-3xl font-bold uppercase tracking-tight text-white leading-none break-words">
+                {pkg.name}
+              </h3>
+              <p className="text-[10px] font-bold text-gold uppercase tracking-[0.3em] mt-2">
+                {provider.name}
+              </p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full text-gray-400 hover:text-white transition-all">
+            <X className="w-8 h-8" />
+          </button>
+        </div>
+
+        <div className="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-10">
+          <div className="flex flex-col lg:flex-row gap-10">
+            <div className="lg:w-1/3 flex flex-col gap-4">
+               <div className="aspect-[9/16] bg-black rounded-sm overflow-hidden border border-white/10 shadow-2xl relative group">
+                  {canLoadVideo ? (
+                    <video className="w-full h-full object-cover z-20 relative" controls playsInline preload="metadata" key={pkg.video} ref={(el) => { if (el) el.volume = 0.2; }}>
+                      <source src={pkg.video} type="video/mp4" />
+                    </video>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-900">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
+                    </div>
+                  )}
+               </div>
+            </div>
+
+            <div className="lg:w-2/3">
+               <h4 className="font-serif text-xl font-bold text-gold mb-8 uppercase tracking-[0.2em] border-b border-gold/20 pb-4 inline-block">
+                 Servicios Exclusivos Incluidos:
+               </h4>
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
+                 {pkg.includes.map((i, idx) => (
+                   <div key={idx} className="flex gap-3 items-start group">
+                     <CheckCircle className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" /> 
+                     <span className="uppercase tracking-widest text-[10px] text-gray-300 font-bold leading-relaxed">{i}</span>
+                   </div>
+                 ))}
+               </div>
+               <div className="mt-12 p-6 bg-gold/5 border border-gold/10 rounded-sm">
+                  <p className="text-[11px] text-gray-400 italic leading-relaxed">
+                    * Todos nuestros shows incluyen personal uniformado y equipo de animación profesional de última generación.
+                  </p>
+               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-8 border-t border-white/10 bg-[#1A1A1A] flex flex-col sm:flex-row justify-between items-center gap-8">
+          <div className="text-center sm:text-left">
+            <p className="text-[10px] text-gray-400 uppercase tracking-[0.3em] mb-1 font-bold">Total del Paquete Seleccionado</p>
+            <div className="flex items-baseline gap-2">
+              <span className="font-serif text-5xl font-bold text-gold">${pkg.price}</span>
+              <span className="text-xs text-gray-500 font-bold">MXN</span>
+            </div>
+          </div>
+          <button 
+            onClick={() => { onSelect(provider, pkg); onClose(); }} 
+            className={`w-full sm:w-auto px-12 py-5 rounded-sm text-xs font-bold uppercase tracking-[0.3em] transition-all duration-500 shadow-2xl ${isSelected ? 'bg-transparent border-2 border-white/20 text-white' : 'bg-gold border-2 border-gold text-white hover:scale-105'}`}
+          >
+            {isSelected ? '✓ Quitar de la lista' : 'Agregar este Plan'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- VISTA PRINCIPAL ---
 export default function SalonView() {
-  // --- ESTADOS ---
   const [clientDetails, setClientDetails] = useState({ name: "", eventType: "" });
   const [eventDate, setEventDate] = useState("");
   const [activeProviderIndex, setActiveProviderIndex] = useState(0);
@@ -30,7 +136,9 @@ export default function SalonView() {
       t2: { active: false, mantelQty: 0, cubreQty: 0, cubreColor: "Rojo" },
     },
     inflatables: [],
-    music: [], 
+    music: [],
+    snacks: { active: false, botanas: [], gomitas: [], semillas: [], cueritos: false },
+    hotcakes: { active: false, normalQty: 0, fruitQty: 0, liquidos: [], granel: [], galletas: [], fruta: [] }
   });
   
   const [cabinConfig, setCabinConfig] = useState({ rent: false, checkIn: "", checkOut: "", guests: 2 });
@@ -39,31 +147,23 @@ export default function SalonView() {
   const [showMusicPackages, setShowMusicPackages] = useState(false);
   const [selectedMusicPackage, setSelectedMusicPackage] = useState(null);
 
-  // --- SOLUCIÓN DE RENDIMIENTO Y SCROLL ---
   useEffect(() => {
-    if (selectedMusicPackage) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
+    if (selectedMusicPackage) { document.body.style.overflow = "hidden"; } 
+    else { document.body.style.overflow = "unset"; }
+    return () => { document.body.style.overflow = "unset"; };
   }, [selectedMusicPackage]);
 
-  // --- LÓGICA ---
   const handleTextSecurity = (val) => val.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s]/g, "");
 
   const toggleTableConfig = (id) => {
-    setSelections((prev) => {
+    setSelections(prev => {
       const active = prev.tables[id].active;
-      if (active) return { ...prev, tables: { ...prev.tables, [id]: { active: false, mantelQty: 0, cubreQty: 0, cubreColor: "Rojo" } } };
-      return { ...prev, tables: { ...prev.tables, [id]: { ...prev.tables[id], active: true, mantelQty: prev.tables[id].mantelQty === 0 ? 1 : prev.tables[id].mantelQty } } };
+      return { ...prev, tables: { ...prev.tables, [id]: { active: !active, mantelQty: active ? 0 : 1, cubreQty: 0, cubreColor: "Rojo" } } };
     });
   };
 
   const updateTableQtyConfig = (id, field, change) => {
-    setSelections((prev) => {
+    setSelections(prev => {
       const newQty = Math.max(0, prev.tables[id][field] + change);
       const newConfig = { ...prev.tables[id], [field]: newQty };
       return { ...prev, tables: { ...prev.tables, [id]: { ...newConfig, active: (newConfig.mantelQty + newConfig.cubreQty) > 0 } } };
@@ -71,20 +171,17 @@ export default function SalonView() {
   };
 
   const updateTableColor = (id, color) => {
-    setSelections(prev => ({
-      ...prev,
-      tables: { ...prev.tables, [id]: { ...prev.tables[id], cubreColor: color } }
-    }));
+    setSelections(prev => ({ ...prev, tables: { ...prev.tables, [id]: { ...prev.tables[id], cubreColor: color } } }));
   };
 
   const toggleMusicPackage = (provider, pkg) => {
-    setSelections((prev) => {
-      const existingIdx = prev.music.findIndex((m) => m.providerId === provider.id);
+    setSelections(prev => {
+      const existingIdx = prev.music.findIndex(m => m.packageId === pkg.id);
       let newMusic = [...prev.music];
-      if (existingIdx > -1) {
-        if (newMusic[existingIdx].packageId === pkg.id) newMusic.splice(existingIdx, 1);
-        else newMusic[existingIdx] = { providerId: provider.id, providerName: provider.name, packageId: pkg.id, packageName: pkg.name, price: pkg.price };
-      } else {
+      if (existingIdx > -1) newMusic.splice(existingIdx, 1);
+      else {
+        const otherIdx = newMusic.findIndex(m => m.providerId === provider.id);
+        if (otherIdx > -1) newMusic.splice(otherIdx, 1);
         newMusic.push({ providerId: provider.id, providerName: provider.name, packageId: pkg.id, packageName: pkg.name, price: pkg.price });
       }
       return { ...prev, music: newMusic };
@@ -92,11 +189,43 @@ export default function SalonView() {
   };
 
   const toggleInflatable = (inf) => {
-    const exists = selections.inflatables.find((i) => i.id === inf.id);
-    setSelections((prev) => ({
-      ...prev,
-      inflatables: exists ? prev.inflatables.filter((i) => i.id !== inf.id) : [...prev.inflatables, inf],
-    }));
+    setSelections(prev => {
+      const exists = prev.inflatables.find(i => i.id === inf.id);
+      return { ...prev, inflatables: exists ? prev.inflatables.filter(i => i.id !== inf.id) : [...prev.inflatables, inf] };
+    });
+  };
+
+  const toggleSnackOption = (category, item, max) => {
+    setSelections(prev => {
+      const currentList = prev.snacks[category];
+      if (currentList.includes(item)) {
+        return { ...prev, snacks: { ...prev.snacks, [category]: currentList.filter(i => i !== item) } };
+      }
+      if (currentList.length < max) {
+        return { ...prev, snacks: { ...prev.snacks, [category]: [...currentList, item] } };
+      }
+      return prev;
+    });
+  };
+
+  const toggleHotcakeOption = (category, item, max) => {
+    setSelections(prev => {
+      const currentList = prev.hotcakes[category];
+      if (currentList.includes(item)) {
+        return { ...prev, hotcakes: { ...prev.hotcakes, [category]: currentList.filter(i => i !== item) } };
+      }
+      if (currentList.length < max) {
+        return { ...prev, hotcakes: { ...prev.hotcakes, [category]: [...currentList, item] } };
+      }
+      return prev;
+    });
+  };
+
+  const getHotcakesSubtotal = () => {
+    if (!selections.hotcakes.active) return 0;
+    const costoNormales = selections.hotcakes.normalQty   * 20;
+    const costoFruta = selections.hotcakes.fruitQty  * 30;
+    return costoNormales + costoFruta;
   };
 
   const getCabinNights = () => {
@@ -111,6 +240,8 @@ export default function SalonView() {
     Object.keys(selections.tables).forEach((k) => {
       if (selections.tables[k].active) total += selections.tables[k].mantelQty * 100 + selections.tables[k].cubreQty * 110;
     });
+    if (selections.snacks.active) total += 1200;
+    total += getHotcakesSubtotal();
     selections.inflatables.forEach((i) => (total += i.price));
     selections.music.forEach((m) => (total += m.price));
     if (cabinConfig.rent) total += cabinData.price * cabinConfig.guests * getCabinNights();
@@ -134,6 +265,25 @@ export default function SalonView() {
       }
     });
 
+    if (selections.snacks.active) {
+      msg += `\n🍪 *BARRA DE SNACKS* ($1,200 MXN)\n`;
+      if(selections.snacks.botanas.length) msg += `  - Botanas: ${selections.snacks.botanas.join(', ')}\n`;
+      if(selections.snacks.gomitas.length) msg += `  - Gomitas: ${selections.snacks.gomitas.join(', ')}\n`;
+      if(selections.snacks.semillas.length) msg += `  - Semillas: ${selections.snacks.semillas.join(', ')}\n`;
+      if(selections.snacks.cueritos) msg += `  - Extras: Cueritos\n`;
+    }
+
+    if (selections.hotcakes.active && getHotcakesSubtotal() > 0) {
+      msg += `\n🥞 *BARRA DE HOT CAKES* ($${getHotcakesSubtotal()} MXN)\n`;
+      if(selections.hotcakes.normalQty > 0) msg += `  - ${selections.hotcakes.normalQty} Órdenes Normales\n`;
+      if(selections.hotcakes.fruitQty > 0) msg += `  - ${selections.hotcakes.fruitQty} Órdenes Con Fruta\n`;
+      if(selections.hotcakes.liquidos.length) msg += `  - Líquidos: ${selections.hotcakes.liquidos.join(', ')}\n`;
+      if(selections.hotcakes.granel.length) msg += `  - A Granel: ${selections.hotcakes.granel.join(', ')}\n`;
+      if(selections.hotcakes.galletas.length) msg += `  - Galletas: ${selections.hotcakes.galletas.join(', ')}\n`;
+      if(selections.hotcakes.fruta.length && selections.hotcakes.fruitQty > 0) msg += `  - Fruta extra: ${selections.hotcakes.fruta.join(', ')}\n`;
+    }
+
+    msg += `\n`;
     selections.inflatables.forEach((i) => (msg += `🎈 ${i.name} - $${i.price} MXN\n`));
     selections.music.forEach((m) => (msg += `🎵 ${m.providerName}: ${m.packageName} - $${m.price} MXN\n`));
     if (cabinConfig.rent) msg += `🏡 Cabaña VIP (${getCabinNights()} noches) - $${cabinData.price * cabinConfig.guests * getCabinNights()} MXN\n`;
@@ -147,7 +297,6 @@ export default function SalonView() {
     window.open(`https://wa.me/525523091732?text=${generateQuoteTextSalon()}`, "_blank");
   };
 
-  // ¡AQUÍ ESTÁ TU VARIABLE INTACTA!
   const currentMusicData = musicTab === "sounds" ? soundData : bandsData;
   const currentArtist = currentMusicData[currentMusicIndex];
 
@@ -166,7 +315,7 @@ export default function SalonView() {
         </header>
 
         {/* 2. Mobiliario */}
-        <section id="mesas" className="py-16 md:py-24 px-4 bg-gray-50">
+        <section id="mesas" className="py-16 md:py-24 px-4 bg-gray-50 border-b border-gray-100">
           <div className="max-w-6xl mx-auto">
             <h2 className="font-serif text-4xl md:text-5xl text-gold text-center font-bold mb-16 uppercase tracking-tight">Selección de Mobiliario</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -214,11 +363,190 @@ export default function SalonView() {
           </div>
         </section>
 
+        {/* --- NUEVA SECCIÓN: SERVICIOS DE CASA --- */}
+        <section id="servicios-casa" className="py-16 md:py-24 bg-white px-4 md:px-6 border-b border-gray-100">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="font-serif text-4xl md:text-5xl text-gold font-bold uppercase tracking-tight">Servicios de Casa</h2>
+              <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-3">Complementos exclusivos preparados por nuestro equipo</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              
+              {/* --- TARJETA: BARRA DE SNACKS --- */}
+              <div className="border border-gray-200 shadow-xl p-8 rounded flex flex-col transition-all hover:border-gold/50">
+                <div className="text-center mb-8">
+                  <Cookie className="w-12 h-12 text-gold mx-auto mb-4" />
+                  <h3 className="font-serif text-3xl text-gray-900 font-bold uppercase tracking-tight mb-2">Barra de Snacks</h3>
+                  <p className="text-gray-600 font-bold text-sm">Configura tu barra personalizada ($1,200 MXN)</p>
+                  <button 
+                    onClick={() => setSelections(prev => ({...prev, snacks: {...prev.snacks, active: !prev.snacks.active}}))}
+                    className={`mt-6 w-full max-w-xs py-3 font-bold text-xs uppercase transition-all rounded-sm ${selections.snacks.active ? 'bg-gold text-white border-2 border-gold shadow-lg' : 'bg-transparent text-gold border-2 border-gold hover:bg-gold/10'}`}
+                  >
+                    {selections.snacks.active ? '✓ Barra Agregada' : 'Agregar Barra'}
+                  </button>
+                </div>
+
+                {selections.snacks.active && (
+                  <div className="flex-grow border border-gray-200 rounded p-6 bg-gray-50 animate-fade-in">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-8">
+                        <div>
+                          <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4"><span>Botanas (2 Máx)</span> <span>{selections.snacks.botanas.length}/2</span></div>
+                          <div className="flex flex-col gap-2">
+                            {SNACKS_OPTS.botanas.map(b => (
+                              <button key={b} onClick={() => toggleSnackOption('botanas', b, 2)} className={`p-2 text-xs font-bold text-left border rounded-sm transition-colors ${selections.snacks.botanas.includes(b) ? 'border-gold text-gray-900 shadow-sm bg-white' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{b}</button>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4"><span>Semillas (2 Máx)</span> <span>{selections.snacks.semillas.length}/2</span></div>
+                          <div className="flex flex-col gap-2">
+                            {SNACKS_OPTS.semillas.map(s => (
+                              <button key={s} onClick={() => toggleSnackOption('semillas', s, 2)} className={`p-2 text-xs font-bold text-left border rounded-sm transition-colors ${selections.snacks.semillas.includes(s) ? 'border-gold text-gray-900 shadow-sm bg-white' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{s}</button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-8">
+                        <div>
+                          <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4"><span>Gomitas (4 Máx)</span> <span>{selections.snacks.gomitas.length}/4</span></div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {SNACKS_OPTS.gomitas.map(g => (
+                              <button key={g} onClick={() => toggleSnackOption('gomitas', g, 4)} className={`p-2 text-[10px] font-bold text-center border rounded-sm transition-colors ${selections.snacks.gomitas.includes(g) ? 'bg-gold border-gold text-white shadow-sm' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{g}</button>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Extras</div>
+                          <button 
+                            onClick={() => setSelections(prev => ({...prev, snacks: {...prev.snacks, cueritos: !prev.snacks.cueritos}}))}
+                            className={`w-full p-3 text-xs font-bold text-center border rounded-sm transition-colors ${selections.snacks.cueritos ? 'bg-gold border-gold text-white shadow-sm' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}
+                          >
+                            {selections.snacks.cueritos ? '✓ Cueritos' : 'Cueritos'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* --- TARJETA: BARRA DE HOT CAKES --- */}
+              <div className="border border-gray-200 shadow-xl p-8 rounded flex flex-col transition-all hover:border-gold/50 bg-white">
+                <div className="text-center mb-8">
+                  <Coffee className="w-12 h-12 text-gold mx-auto mb-4" />
+                  <h3 className="font-serif text-3xl text-gray-900 font-bold uppercase tracking-tight mb-2">Barra de Hot Cakes</h3>
+                  <p className="text-gray-500 font-bold text-[10px] uppercase mt-2">* Órdenes de 10 piezas (Máx. 200 combinados)</p>
+                  
+                  <button 
+                    onClick={() => setSelections(prev => ({
+                      ...prev, 
+                      hotcakes: {
+                        ...prev.hotcakes, 
+                        active: !prev.hotcakes.active,
+                        normalQty: !prev.hotcakes.active ? 10 : 0, 
+                        fruitQty: 0
+                      }
+                    }))}
+                    className={`mt-6 w-full max-w-xs py-3 font-bold text-xs uppercase transition-all rounded-sm mx-auto ${selections.hotcakes.active ? 'bg-gold text-white border-2 border-gold shadow-lg' : 'bg-transparent text-gold border-2 border-gold hover:bg-gold/10'}`}
+                  >
+                    {selections.hotcakes.active ? '✓ Barra Agregada' : 'Agregar Barra'}
+                  </button>
+                </div>
+
+                {selections.hotcakes.active && (
+                  <div className="animate-fade-in flex-grow flex flex-col">
+                    <div className="space-y-4 mb-8 p-4 border border-gray-200 rounded-sm bg-white shadow-sm">
+                      {[{f:'normalQty', l:'Normales', p:20}, {f:'fruitQty', l:'Con Fruta', p:30}].map(item => (
+                        <div key={item.f} className="flex justify-between items-center gap-4 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                          <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">{item.l} <span className="text-[9px] text-gray-400 block">(${item.p} x orden)</span></span>
+                          
+                          <div className="flex items-center border rounded-sm bg-gray-50 overflow-hidden h-10 border-gray-300">
+                            <button onClick={() => setSelections(prev => ({...prev, hotcakes: {...prev.hotcakes, [item.f]: Math.max(0, prev.hotcakes[item.f] - 10)}}))} className="px-4 text-gold font-bold text-lg hover:bg-gray-200 transition-colors">-</button>
+                            <span className="w-8 text-center font-bold text-gray-900 text-sm">{selections.hotcakes[item.f]}</span>
+                            
+                            {/* AQUÍ ESTÁ EL CAMBIO DE LÓGICA COMPARTIDA DE MÁXIMO 200 */}
+                            <button 
+                              onClick={() => setSelections(prev => {
+                                const totalPzas = prev.hotcakes.normalQty + prev.hotcakes.fruitQty;
+                                if (totalPzas >= 200) return prev; // Límite de 200 combinado
+                                return {
+                                  ...prev, 
+                                  hotcakes: {
+                                    ...prev.hotcakes, 
+                                    [item.f]: prev.hotcakes[item.f] + 10
+                                  }
+                                };
+                              })} 
+                              className="px-4 text-gold font-bold text-lg hover:bg-gray-200 transition-colors"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {getHotcakesSubtotal() > 0 && (
+                      <div className="flex-grow border border-gray-200 rounded p-6 bg-gray-50 animate-fade-in">
+                        <div className="space-y-6">
+                          <div>
+                            <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3"><span>Líquidos (3 Máx)</span> <span>{selections.hotcakes.liquidos.length}/3</span></div>
+                            <div className="grid grid-cols-3 gap-2">
+                              {HOTCAKES_OPTS.liquidos.map(l => (
+                                <button key={l} onClick={() => toggleHotcakeOption('liquidos', l, 3)} className={`p-2 text-[9px] font-bold border rounded-sm transition-colors ${selections.hotcakes.liquidos.includes(l) ? 'bg-gold border-gold text-white shadow-sm' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{l}</button>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3"><span>A Granel (4 Máx)</span> <span>{selections.hotcakes.granel.length}/4</span></div>
+                            <div className="grid grid-cols-2 gap-2">
+                              {HOTCAKES_OPTS.granel.map(g => (
+                                <button key={g} onClick={() => toggleHotcakeOption('granel', g, 4)} className={`p-2 text-[10px] font-bold border rounded-sm transition-colors ${selections.hotcakes.granel.includes(g) ? 'bg-gold border-gold text-white shadow-sm' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{g}</button>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3"><span>Galletas (1 Máx)</span> <span>{selections.hotcakes.galletas.length}/1</span></div>
+                            <div className="grid grid-cols-3 gap-2">
+                              {HOTCAKES_OPTS.galletas.map(g => (
+                                <button key={g} onClick={() => toggleHotcakeOption('galletas', g, 1)} className={`p-2 text-[9px] font-bold border rounded-sm transition-colors ${selections.hotcakes.galletas.includes(g) ? 'border-gold text-gray-900 shadow-sm bg-white' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{g}</button>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          {/* OPCIONES DE FRUTA (Solo visibles si se agregaron Hot Cakes con fruta) */}
+                          {selections.hotcakes.fruitQty > 0 && (
+                            <div className="animate-fade-in pt-4 border-t border-gray-200">
+                              <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3"><span>Frutas Frescas (2 Máx)</span> <span>{selections.hotcakes.fruta.length}/2</span></div>
+                              <div className="grid grid-cols-4 gap-2">
+                                {HOTCAKES_OPTS.fruta.map(f => (
+                                  <button key={f} onClick={() => toggleHotcakeOption('fruta', f, 2)} className={`p-2 text-[9px] font-bold border rounded-sm transition-colors ${selections.hotcakes.fruta.includes(f) ? 'bg-gold border-gold text-white shadow-sm' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{f}</button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="mt-8 text-center bg-gray-50 p-4 rounded border border-gray-200">
+                      <p className="font-serif text-3xl text-gold font-bold">Subtotal: ${getHotcakesSubtotal()} MXN</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* 3. Inflables */}
-        <section id="inflables" className="py-16 md:py-24 bg-white px-4 md:px-6">
+        <section id="inflables" className="py-16 md:py-24 bg-gray-50 px-4 md:px-6 border-b border-gray-100">
           <div className="max-w-7xl mx-auto">
             <h2 className="font-serif text-4xl md:text-5xl text-gold mb-12 text-center font-bold uppercase tracking-tight">Inflables Disponibles</h2>
-            <div className="flex items-center justify-between md:justify-center gap-4 bg-gray-100 p-6 rounded-sm shadow-sm max-w-3xl mx-auto mb-12 border border-gray-200">
+            <div className="flex items-center justify-between md:justify-center gap-4 bg-white p-6 rounded-sm shadow-sm max-w-3xl mx-auto mb-12 border border-gray-200">
               <button onClick={() => setActiveProviderIndex(prev => (prev - 1 + inflatablesProviders.length) % inflatablesProviders.length)} className="p-3 bg-white rounded-full shadow hover:bg-gold transition-colors"><ChevronLeft /></button>
               <div className="text-center flex-1 px-4">
                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">PROVEEDOR ACTUAL</p>
@@ -230,7 +558,7 @@ export default function SalonView() {
               {inflatablesProviders[activeProviderIndex].products.map((inf) => {
                 const sel = selections.inflatables.some(i => i.id === inf.id);
                 return (
-                  <div key={inf.id} className={`bg-gray-50 border-2 rounded-sm overflow-hidden transition-all duration-300 ${sel ? 'border-gold shadow-md scale-[1.03]' : 'border-gray-200'}`}>
+                  <div key={inf.id} className={`bg-white border-2 rounded-sm overflow-hidden transition-all duration-300 ${sel ? 'border-gold shadow-md scale-[1.03]' : 'border-gray-200'}`}>
                     <img src={inf.img} alt={inf.name} className="w-full h-56 object-cover" />
                     <div className="p-6 text-center">
                       <h4 className="font-bold text-gray-900 mb-2 text-lg uppercase tracking-tight">{inf.name}</h4>
@@ -261,7 +589,6 @@ export default function SalonView() {
             <div key={currentArtist.id} className="fade-in">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center bg-gray-800/50 p-6 md:p-12 rounded-sm border border-white/5 relative shadow-2xl">
                 <div className="lg:col-span-7 rounded-sm overflow-hidden shadow-2xl aspect-video bg-black">
-                  {/* VIDEO PRINCIPAL: manual, con controls */}
                   <video className="w-full h-full object-cover" controls playsInline key={currentArtist.mainVideo} ref={(el) => { if (el) el.volume = 0.1; }}>
                     <source src={currentArtist.mainVideo} type="video/mp4" />
                   </video>
@@ -304,8 +631,7 @@ export default function SalonView() {
                           }`}
                         >
                           <div className="h-40 relative overflow-hidden bg-black flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                            {/* VIDEO DE PAQUETE: manual, controls y stopPropagation */}
-                            <video className="w-full h-full object-cover z-20 relative opacity-80" controls playsInline key={pkg.video} ref={(el) => { if (el) el.volume = 0.1; }}>
+                            <video className="w-full h-full object-cover z-20 relative opacity-80 group-hover:opacity-100 transition-opacity" controls playsInline key={pkg.video} ref={(el) => { if (el) el.volume = 0.1; }}>
                               <source src={pkg.video} type="video/mp4" />
                             </video>
                           </div>
@@ -321,8 +647,8 @@ export default function SalonView() {
                                   </li>
                                 ))}
                                 {hasManyBenefits && (
-                                  <li className="text-[10px] text-gold font-bold uppercase tracking-widest pt-2 border-t border-white/5 text-center group-hover:underline">
-                                    + Ver servicios detallados
+                                  <li className="text-[10px] text-gold font-bold uppercase tracking-widest pt-2 border-t border-white/5 text-center group-hover:underline flex items-center justify-center gap-2">
+                                    <Search className="w-3 h-3"/> Ver servicios detallados
                                   </li>
                                 )}
                               </ul>
@@ -413,7 +739,7 @@ export default function SalonView() {
               </div>
               <div className="flex flex-col justify-between">
                 <div className="bg-gray-50 border-2 border-gray-200 p-8 md:p-10 rounded-sm mb-10 font-bold text-sm">
-                  <h4 className="font-serif text-3xl text-gold border-b-4 border-gold/20 pb-5 mb-8 uppercase text-center">Resumen</h4>
+                  <h4 className="font-serif text-3xl text-gold border-b-4 border-gold/20 pb-5 mb-8 uppercase text-center">Resumen Final</h4>
                   <div className="space-y-5">
                      <p className="flex justify-between items-center text-xs"><span>RENTA BASE SALÓN</span> <span>$2,500</span></p>
                      {salonConfig.extraHours > 0 && <p className="flex justify-between items-center text-xs"><span>HORAS EXTRA ({salonConfig.extraHours}h)</span> <span>${salonConfig.extraHours * 250}</span></p>}
@@ -429,6 +755,11 @@ export default function SalonView() {
                          </div>
                        );
                      })}
+
+                     {/* RESUMEN SERVICIOS DE CASA */}
+                     {selections.snacks.active && <p className="flex justify-between items-center text-xs pt-4 border-t border-gray-200"><span>🍪 BARRA DE SNACKS</span> <span>$1,200</span></p>}
+                     {getHotcakesSubtotal() > 0 && <p className="flex justify-between items-center text-xs pt-4 border-t border-gray-200"><span>🥞 BARRA DE HOT CAKES</span> <span>${getHotcakesSubtotal()}</span></p>}
+
                      {selections.inflatables.map(i => <div key={i.id} className="pt-4 border-t border-gray-200 flex justify-between items-center text-xs"><span>🎈 {i.name}</span> <span>${i.price}</span></div>)}
                      {selections.music.map(m => <div key={m.packageId} className="pt-4 border-t border-gray-200 flex justify-between items-center text-xs"><span>🎵 {m.providerName}: {m.packageName}</span> <span>${m.price}</span></div>)}
                      {cabinConfig.rent && <div className="pt-4 border-t border-gold/20 bg-gold/5 p-4 rounded mt-4 flex justify-between items-center font-bold"><span>🏡 Cabaña VIP ({getCabinNights()} Noches)</span> <span>${cabinData.price * cabinConfig.guests * getCabinNights()}</span></div>}
@@ -446,14 +777,13 @@ export default function SalonView() {
         </section>
       </div>
 
-      {/* --- MODAL EMERGENTE (AHORA ESTÁ FUERA DEL DIV FADE-IN Y SIN BACKDROP-BLUR PARA MEJOR RENDIMIENTO) --- */}
+      {/* --- MODAL EMERGENTE --- */}
       {selectedMusicPackage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-10 bg-black/95 animate-fade-in" onClick={() => setSelectedMusicPackage(null)}>
           <div 
             className="relative bg-[#1A1A1A] text-white border border-gold/30 rounded-sm shadow-[0_0_100px_rgba(197,160,89,0.2)] w-full max-w-5xl max-h-full flex flex-col animate-pop-in overflow-hidden" 
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header de la Modal */}
             <div className="p-6 md:p-8 border-b border-white/10 flex justify-between items-center bg-[#1A1A1A]">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gold/10 rounded-full flex items-center justify-center text-gold border border-gold/20">
@@ -476,10 +806,8 @@ export default function SalonView() {
               </button>
             </div>
 
-            {/* Contenido Principal */}
             <div className="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-10">
               <div className="flex flex-col lg:flex-row gap-10">
-                {/* Columna Video en Modal: MANUAL CON CONTROLES */}
                 <div className="lg:w-1/3 flex flex-col gap-4">
                    <div className="aspect-[9/16] bg-black rounded-sm overflow-hidden border border-white/10 shadow-2xl relative group">
                       <video className="w-full h-full object-cover z-20 relative" controls playsInline key={selectedMusicPackage.package.video} ref={(el) => { if (el) el.volume = 0.1; }}>
@@ -488,7 +816,6 @@ export default function SalonView() {
                    </div>
                 </div>
 
-                {/* Columna Detalles */}
                 <div className="lg:w-2/3">
                    <h4 className="font-serif text-xl font-bold text-gold mb-8 uppercase tracking-[0.2em] border-b border-gold/20 pb-4 inline-block">
                      Servicios Exclusivos Incluidos:
@@ -513,7 +840,6 @@ export default function SalonView() {
               </div>
             </div>
 
-            {/* Footer de la Modal */}
             <div className="p-8 border-t border-white/10 bg-[#1A1A1A] flex flex-col sm:flex-row justify-between items-center gap-8">
               <div className="text-center sm:text-left">
                 <p className="text-[10px] text-gray-400 uppercase tracking-[0.3em] mb-1 font-bold">Total del Paquete Seleccionado</p>

@@ -230,7 +230,7 @@ export const soundData = [
     type: "Show y Animación",
     name: "Producciones Kalex",
     mainVideo:
-      "https://res.cloudinary.com/dnopl3t98/video/upload/v1773901241/4_swdkke.mp4",
+      "https://res.cloudinary.com/dnopl3t98/video/upload/v1774245328/2_diotju.mp4",
     description:
       "Todos los paquetes tienen audio profesional, DJ en vivo, 5 horas de música continua + 2 de cortesía para música de fondo",
     packages: [
@@ -239,7 +239,7 @@ export const soundData = [
         name: "Paquete silver",
         price: 6000,
         video:
-          "https://res.cloudinary.com/dnopl3t98/video/upload/v1773901235/3_vabudx.mp4",
+          "https://res.cloudinary.com/dnopl3t98/video/upload/v1774245331/video_3_sin_marca_k15ohu.mp4",
         includes: [
           "Show La guerra de los 80's",
           "Show Los 90's",
@@ -259,7 +259,7 @@ export const soundData = [
         name: "PAQUETE GOLD ",
         price: 8000,
         video:
-          "https://res.cloudinary.com/dnopl3t98/video/upload/v1773901238/1_pf4tuy.mp4",
+          "https://res.cloudinary.com/dnopl3t98/video/upload/v1774245333/1_sin_marca_r0te3w.mp4",
         includes: [
           "Show La guerra de los 80's",
           "Show Los 90's",
@@ -280,7 +280,7 @@ export const soundData = [
         name: "PAQUETE PLATINUM",
         price: 10000,
         video:
-          "https://res.cloudinary.com/dnopl3t98/video/upload/v1773901238/1_pf4tuy.mp4",
+          "https://res.cloudinary.com/dnopl3t98/video/upload/v1774246925/WhatsApp_Video_2026-03-23_at_12.18.14_AM_kyj2aq.mp4",
         includes: [
           "Souvenirs",
           "2 botargas",
@@ -339,28 +339,13 @@ export const soundData = [
 export const bandsData = [
   {
     id: "b1",
-    type: "Grupo Norteño",
-    name: "Los Reyes del Norte",
+    type: "Muy pronto",
+    name: "Muy pronto",
     mainVideo:
       "https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ca2a8ebfae0e536bf301ebc1&profile_id=164",
-    description: "Música en vivo con el auténtico sabor del norte.",
+    description: "Muy pronto",
     packages: [
-      {
-        id: "b1-p1",
-        name: "Serenata (1 Hora)",
-        price: 2500,
-        video:
-          "https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ca2a8ebfae0e536bf301ebc1&profile_id=164",
-        includes: ["6 músicos uniformados", "Audio compacto"],
-      },
-      {
-        id: "b1-p2",
-        name: "Evento Completo",
-        price: 6500,
-        video:
-          "https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ca2a8ebfae0e536bf301ebc1&profile_id=164",
-        includes: ["3 horas continuas", "Show interactivo"],
-      },
+
     ],
   },
 ];
