@@ -95,8 +95,8 @@ const MusicDetailsModal = ({ data, onClose, onSelect, isSelected }) => {
                  ))}
                </div>
                <div className="mt-12 p-6 bg-gold/5 border border-gold/10 rounded-sm">
-                  <p className="text-[11px] text-gray-400 italic leading-relaxed">
-                    * Todos nuestros shows incluyen personal uniformado y equipo de animación profesional de última generación.
+                  <p className="text-[16px] text-gray-400 italic leading-relaxed">
+                    * Todos los paquetes están sujetos a disponibilidad. Para más detalles o solicitudes especiales, no dudes en contactarnos.
                   </p>
                </div>
             </div>
@@ -136,7 +136,7 @@ export default function SalonView() {
       t2: { active: false, mantelQty: 0, cubreQty: 0, cubreColor: "Rojo" },
     },
     inflatables: [],
-    music: [],
+    music: [], 
     snacks: { active: false, botanas: [], gomitas: [], semillas: [], cueritos: false },
     hotcakes: { active: false, normalQty: 0, fruitQty: 0, liquidos: [], granel: [], galletas: [], fruta: [] }
   });
@@ -147,23 +147,31 @@ export default function SalonView() {
   const [showMusicPackages, setShowMusicPackages] = useState(false);
   const [selectedMusicPackage, setSelectedMusicPackage] = useState(null);
 
+  // --- SOLUCIÓN DE RENDIMIENTO Y SCROLL ---
   useEffect(() => {
-    if (selectedMusicPackage) { document.body.style.overflow = "hidden"; } 
-    else { document.body.style.overflow = "unset"; }
-    return () => { document.body.style.overflow = "unset"; };
+    if (selectedMusicPackage) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [selectedMusicPackage]);
 
+  // --- LÓGICA ---
   const handleTextSecurity = (val) => val.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s]/g, "");
 
   const toggleTableConfig = (id) => {
-    setSelections(prev => {
+    setSelections((prev) => {
       const active = prev.tables[id].active;
-      return { ...prev, tables: { ...prev.tables, [id]: { active: !active, mantelQty: active ? 0 : 1, cubreQty: 0, cubreColor: "Rojo" } } };
+      if (active) return { ...prev, tables: { ...prev.tables, [id]: { active: false, mantelQty: 0, cubreQty: 0, cubreColor: "Rojo" } } };
+      return { ...prev, tables: { ...prev.tables, [id]: { ...prev.tables[id], active: true, mantelQty: prev.tables[id].mantelQty === 0 ? 1 : prev.tables[id].mantelQty } } };
     });
   };
 
   const updateTableQtyConfig = (id, field, change) => {
-    setSelections(prev => {
+    setSelections((prev) => {
       const newQty = Math.max(0, prev.tables[id][field] + change);
       const newConfig = { ...prev.tables[id], [field]: newQty };
       return { ...prev, tables: { ...prev.tables, [id]: { ...newConfig, active: (newConfig.mantelQty + newConfig.cubreQty) > 0 } } };
@@ -171,17 +179,20 @@ export default function SalonView() {
   };
 
   const updateTableColor = (id, color) => {
-    setSelections(prev => ({ ...prev, tables: { ...prev.tables, [id]: { ...prev.tables[id], cubreColor: color } } }));
+    setSelections(prev => ({
+      ...prev,
+      tables: { ...prev.tables, [id]: { ...prev.tables[id], cubreColor: color } }
+    }));
   };
 
   const toggleMusicPackage = (provider, pkg) => {
-    setSelections(prev => {
-      const existingIdx = prev.music.findIndex(m => m.packageId === pkg.id);
+    setSelections((prev) => {
+      const existingIdx = prev.music.findIndex((m) => m.providerId === provider.id);
       let newMusic = [...prev.music];
-      if (existingIdx > -1) newMusic.splice(existingIdx, 1);
-      else {
-        const otherIdx = newMusic.findIndex(m => m.providerId === provider.id);
-        if (otherIdx > -1) newMusic.splice(otherIdx, 1);
+      if (existingIdx > -1) {
+        if (newMusic[existingIdx].packageId === pkg.id) newMusic.splice(existingIdx, 1);
+        else newMusic[existingIdx] = { providerId: provider.id, providerName: provider.name, packageId: pkg.id, packageName: pkg.name, price: pkg.price };
+      } else {
         newMusic.push({ providerId: provider.id, providerName: provider.name, packageId: pkg.id, packageName: pkg.name, price: pkg.price });
       }
       return { ...prev, music: newMusic };
@@ -189,10 +200,11 @@ export default function SalonView() {
   };
 
   const toggleInflatable = (inf) => {
-    setSelections(prev => {
-      const exists = prev.inflatables.find(i => i.id === inf.id);
-      return { ...prev, inflatables: exists ? prev.inflatables.filter(i => i.id !== inf.id) : [...prev.inflatables, inf] };
-    });
+    const exists = selections.inflatables.find((i) => i.id === inf.id);
+    setSelections((prev) => ({
+      ...prev,
+      inflatables: exists ? prev.inflatables.filter((i) => i.id !== inf.id) : [...prev.inflatables, inf],
+    }));
   };
 
   const toggleSnackOption = (category, item, max) => {
@@ -221,18 +233,19 @@ export default function SalonView() {
     });
   };
 
-  const getHotcakesSubtotal = () => {
-    if (!selections.hotcakes.active) return 0;
-    const costoNormales = selections.hotcakes.normalQty   * 20;
-    const costoFruta = selections.hotcakes.fruitQty  * 30;
-    return costoNormales + costoFruta;
-  };
-
   const getCabinNights = () => {
     if (!cabinConfig.checkIn || !cabinConfig.checkOut) return 1;
     const diff = new Date(cabinConfig.checkOut) - new Date(cabinConfig.checkIn);
     const nights = Math.ceil(diff / (1000 * 60 * 60 * 24));
     return nights > 0 ? nights : 1;
+  };
+
+  // --- CÁLCULO DE HOT CAKES (N ÓRDENES x PRECIO) ---
+  const getHotcakesSubtotal = () => {
+    if (!selections.hotcakes.active) return 0;
+    const costoNormales = selections.hotcakes.normalQty * 20;
+    const costoFruta = selections.hotcakes.fruitQty * 30;
+    return costoNormales + costoFruta;
   };
 
   const totalEstimadoSalon = () => {
@@ -289,6 +302,7 @@ export default function SalonView() {
     if (cabinConfig.rent) msg += `🏡 Cabaña VIP (${getCabinNights()} noches) - $${cabinData.price * cabinConfig.guests * getCabinNights()} MXN\n`;
 
     msg += `\n💰 *COSTO TOTAL ESTIMADO:* $${totalEstimadoSalon()} MXN\n`;
+    msg += `\n⚠️ *El precio final se validará por mensaje, ya que bandas e inflables están sujetos a disponibilidad.*\n`;
     return encodeURIComponent(msg);
   };
 
@@ -374,19 +388,21 @@ export default function SalonView() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               
               {/* --- TARJETA: BARRA DE SNACKS --- */}
-              <div className="border border-gray-200 shadow-xl p-8 rounded flex flex-col transition-all hover:border-gold/50">
+              <div className="border border-gray-200 shadow-xl p-8 rounded flex flex-col transition-all hover:border-gold/50 bg-white">
                 <div className="text-center mb-8">
                   <Cookie className="w-12 h-12 text-gold mx-auto mb-4" />
                   <h3 className="font-serif text-3xl text-gray-900 font-bold uppercase tracking-tight mb-2">Barra de Snacks</h3>
-                  <p className="text-gray-600 font-bold text-sm">Configura tu barra personalizada ($1,200 MXN)</p>
+                  <p className="text-gray-500 font-bold text-[10px] uppercase mt-2">Configura tu barra personalizada ($1,200 MXN)</p>
+                  
                   <button 
                     onClick={() => setSelections(prev => ({...prev, snacks: {...prev.snacks, active: !prev.snacks.active}}))}
-                    className={`mt-6 w-full max-w-xs py-3 font-bold text-xs uppercase transition-all rounded-sm ${selections.snacks.active ? 'bg-gold text-white border-2 border-gold shadow-lg' : 'bg-transparent text-gold border-2 border-gold hover:bg-gold/10'}`}
+                    className={`mt-6 w-full max-w-xs py-3 font-bold text-xs uppercase transition-all rounded-sm mx-auto ${selections.snacks.active ? 'bg-gold text-white border-2 border-gold shadow-lg' : 'bg-transparent text-gold border-2 border-gold hover:bg-gold/10'}`}
                   >
                     {selections.snacks.active ? '✓ Barra Agregada' : 'Agregar Barra'}
                   </button>
                 </div>
 
+                {/* Renderizado condicional: Solo aparece si está activo */}
                 {selections.snacks.active && (
                   <div className="flex-grow border border-gray-200 rounded p-6 bg-gray-50 animate-fade-in">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -438,7 +454,7 @@ export default function SalonView() {
                 <div className="text-center mb-8">
                   <Coffee className="w-12 h-12 text-gold mx-auto mb-4" />
                   <h3 className="font-serif text-3xl text-gray-900 font-bold uppercase tracking-tight mb-2">Barra de Hot Cakes</h3>
-                  <p className="text-gray-500 font-bold text-[10px] uppercase mt-2">* Órdenes de 10 piezas (Máx. 200 combinados)</p>
+                  <p className="text-gray-500 font-bold text-[10px] uppercase mt-2">* Órdenes de 10 piezas (Máx. 200 órdenes en total)</p>
                   
                   <button 
                     onClick={() => setSelections(prev => ({
@@ -463,15 +479,14 @@ export default function SalonView() {
                         <div key={item.f} className="flex justify-between items-center gap-4 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
                           <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">{item.l} <span className="text-[9px] text-gray-400 block">(${item.p} x orden)</span></span>
                           
+                          {/* LÓGICA DE LIMITE COMPARTIDO DE 200 ÓRDENES EN TOTAL */}
                           <div className="flex items-center border rounded-sm bg-gray-50 overflow-hidden h-10 border-gray-300">
                             <button onClick={() => setSelections(prev => ({...prev, hotcakes: {...prev.hotcakes, [item.f]: Math.max(0, prev.hotcakes[item.f] - 10)}}))} className="px-4 text-gold font-bold text-lg hover:bg-gray-200 transition-colors">-</button>
                             <span className="w-8 text-center font-bold text-gray-900 text-sm">{selections.hotcakes[item.f]}</span>
-                            
-                            {/* AQUÍ ESTÁ EL CAMBIO DE LÓGICA COMPARTIDA DE MÁXIMO 200 */}
                             <button 
                               onClick={() => setSelections(prev => {
-                                const totalPzas = prev.hotcakes.normalQty + prev.hotcakes.fruitQty;
-                                if (totalPzas >= 200) return prev; // Límite de 200 combinado
+                                const totalOrdenes = prev.hotcakes.normalQty + prev.hotcakes.fruitQty;
+                                if (totalOrdenes >= 200) return prev; // El límite conjunto es 200
                                 return {
                                   ...prev, 
                                   hotcakes: {
@@ -517,7 +532,6 @@ export default function SalonView() {
                             </div>
                           </div>
                           
-                          {/* OPCIONES DE FRUTA (Solo visibles si se agregaron Hot Cakes con fruta) */}
                           {selections.hotcakes.fruitQty > 0 && (
                             <div className="animate-fade-in pt-4 border-t border-gray-200">
                               <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3"><span>Frutas Frescas (2 Máx)</span> <span>{selections.hotcakes.fruta.length}/2</span></div>
@@ -766,8 +780,14 @@ export default function SalonView() {
                   </div>
                 </div>
                 <div className="bg-[#2A2A2A] text-white p-10 text-center rounded-sm shadow-2xl">
-                  <p className="font-serif text-6xl md:text-8xl text-gold font-bold mb-6">${totalEstimadoSalon()}</p>
-                  <button onClick={sendWhatsAppSalon} disabled={!isSalonFormValid} className={`w-full py-4 px-4 text-sm font-bold uppercase flex justify-center items-center gap-3 transition-all rounded-sm mt-8 border-2 ${isSalonFormValid ? 'bg-[#25D366] border-[#25D366] text-white hover:bg-[#1DA851]' : 'bg-gray-200 border-gray-200 text-gray-400'}`}>
+                  <p className="font-serif text-6xl md:text-8xl text-gold font-bold mb-4">${totalEstimadoSalon()}</p>
+                  
+                  {/* --- NOTA DE DISPONIBILIDAD --- */}
+                  <p className="text-[11px] text-white/60 italic mb-6 px-2 leading-relaxed">
+                    * El precio final se validará por mensaje, ya que bandas e inflables están sujetos a disponibilidad.
+                  </p>
+
+                  <button onClick={sendWhatsAppSalon} disabled={!isSalonFormValid} className={`w-full py-4 px-4 text-sm font-bold uppercase flex justify-center items-center gap-3 transition-all rounded-sm border-2 ${isSalonFormValid ? 'bg-[#25D366] border-[#25D366] text-white hover:bg-[#1DA851]' : 'bg-gray-200 border-gray-200 text-gray-400'}`}>
                     {isSalonFormValid ? <><MessageCircle className="w-7 h-7" /> Enviar por WhatsApp</> : "Faltan datos de reserva"}
                   </button>
                 </div>
@@ -832,8 +852,8 @@ export default function SalonView() {
                    </div>
                    
                    <div className="mt-12 p-6 bg-gold/5 border border-gold/10 rounded-sm">
-                      <p className="text-[11px] text-gray-400 italic leading-relaxed">
-                        * Todos nuestros shows incluyen personal uniformado y equipo de animación profesional de última generación.
+                      <p className="text-[16px] text-gray-400 italic leading-relaxed">
+                        * Todos los paquetes están sujetos a disponibilidad. Para más detalles o solicitudes especiales, no dudes en contactarnos.
                       </p>
                    </div>
                 </div>

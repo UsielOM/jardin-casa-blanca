@@ -228,7 +228,7 @@ export const soundData = [
   {
     id: "s2", // Proveedor 2
     type: "Show y Animación",
-    name: "Producciones Kalex",
+    name: "Provedor musical I",
     mainVideo:
       "https://res.cloudinary.com/dnopl3t98/video/upload/v1774245328/2_diotju.mp4",
     description:
@@ -339,13 +339,127 @@ export const soundData = [
 export const bandsData = [
   {
     id: "b1",
-    type: "Muy pronto",
-    name: "Muy pronto",
+    type: "Banda norteño",
+    name: "Proveedor I Banda Norteña",
     mainVideo:
-      "https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ca2a8ebfae0e536bf301ebc1&profile_id=164",
-    description: "Muy pronto",
+      "https://res.cloudinary.com/dnopl3t98/video/upload/v1774496244/WhatsApp_Video_2026-03-25_at_9.36.21_PM_bdgm9u.mp4",
+    description: "Somo un grupo musical de nueva generacion ayudanos a crecer y seguir tocando",
     packages: [
-
+      {
+        id: "sb1-p1",
+        name: "Paquete Uno",
+        price: 1700,
+        video:
+          "https://res.cloudinary.com/dnopl3t98/video/upload/v1774497988/VIDEO_PROMO_tn7o8s.mp4",
+        includes: [
+          "Acordeon",
+          "Bajo",
+          "guitarra",
+          "cantante",
+          "Show de 1 hora",
+        ],
+      },
+    ],
+  },
+  {
+    id: "b2",
+    type: "Banda norteño",
+    name: "Proveedor II Banda Norteña",
+    mainVideo:
+      "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499123/WhatsApp_Video_2026-03-25_at_10.16.45_PM_xauqce.mp4",
+    description: "Somo un grupo musical de norteño",
+    packages: [
+      {
+        id: "sb1-p1",
+        name: "Trío Norteño",
+        price: 2000,
+        video:
+          "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499214/WhatsApp_Video_2026-03-25_at_10.16.53_PM_mpbhxt.mp4",
+        includes: [
+          "acordeón",
+          "Bajo",
+          "guitarra",
+          "cantante",
+          "Show de 1 hora",
+        ],
+      },
+      {
+        id: "sb1-p2",
+        name: "PAQUETE COMPLETO",
+        price: 2400,
+        video:
+          "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499217/Video_de_mutzan_smyh0r.mp4",
+        includes: [
+          "acordeón",
+          "Bajo",
+          "guitarra",
+          "cantante",
+          "Batería",
+          "Show de 1 hora",
+        ],
+      },
+    ],
+  },
+    {
+    id: "b3",
+    type: "Banda norteño",
+    name: "Proveedor III Banda Norteña",
+    mainVideo:
+      "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499766/WhatsApp_Video_2026-03-25_at_10.21.50_PM_lenmf1.mp4",
+    description: "Somo un grupo musical de norteño",
+    packages: [
+      {
+        id: "sb1-p1",
+        name: "PAQUETE BÁSICO",
+        price: 2400,
+        video:
+          "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499767/WhatsApp_Video_2026-03-25_at_10.21.13_PM_of1qve.mp4",
+        includes: [
+          "acordeón",
+          "Bajo",
+          "guitarra",
+          "bajo quinto",
+          "audio para 30 a 50 personas.",
+          "Show de 1 hora",
+        ],
+      },
+      {
+        id: "sb1-p2",
+        name: "PAQUETE CON PERCUSIÓN",
+        price: 8400,
+        video:
+          "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499768/WhatsApp_Video_2026-03-25_at_10.20.50_PM_zdoapr.mp4",
+        includes: [
+          "guitarra eléctrica",
+          "bajo electrico",
+          " simulador de batería",
+          "con audio y luces.",
+          "Capacidad: 70 a 100 personas.",
+          "Show de 3 hora",
+        ],
+      },
+      {
+        id: "sb1-p3",
+        name: "PAQUETE COMPLETO",
+        price: 19900,
+        video:
+          "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499768/WhatsApp_Video_2026-03-25_at_10.21.49_PM_ivmpn3.mp4",
+        includes: [
+          "Acordeón",
+          "Bajo quinto",
+          "Guitarra electrica",
+          "Bajarra",
+          "requinto",
+          "equínta",
+          "batería completa",
+          "audio",
+          "chisiisperos",
+          "flamas",
+          "luces",
+          "Capacidad: 150 a 200 personas.",
+          "Show de 5 horas",
+        ],
+      },
     ],
   },
 ];
