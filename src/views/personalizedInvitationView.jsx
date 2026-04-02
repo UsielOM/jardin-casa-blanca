@@ -10,7 +10,7 @@ const INVITATION_PACKAGES = [
     id: "esencial",
     name: "Paquete Esencial",
     price: 500,
-    video: "https://res.cloudinary.com/demo/video/upload/v1690000000/sample.mp4", // <-- CAMBIA ESTO POR TU LINK REAL
+    video: "https://res.cloudinary.com/df1cdbvxm/video/upload/v1775103550/Basico_nrhbxu.mp4", // <-- CAMBIA ESTO POR TU LINK REAL
     desc: "Ideal para eventos íntimos o exprés. Funcional, elegante y directo al grano.",
     features: [
       "Soporte hasta el dia del evento ",
@@ -26,7 +26,7 @@ const INVITATION_PACKAGES = [
     id: "pro",
     name: "Paquete Pro",
     price: 1300,
-    video: "https://res.cloudinary.com/demo/video/upload/v1690000000/sample.mp4", // <-- CAMBIA ESTO POR TU LINK REAL
+    video: "https://res.cloudinary.com/df1cdbvxm/video/upload/v1775103546/normal_g4mmdm.mp4", // <-- CAMBIA ESTO POR TU LINK REAL
     desc: "Todo lo que necesitas para una experiencia interactiva y completa. Tu evento con un toque único.",
     isPopular: true,
     features: [
@@ -43,7 +43,7 @@ const INVITATION_PACKAGES = [
     id: "vip",
     name: "Paquete VIP",
     price: 2000,
-    video: "https://res.cloudinary.com/demo/video/upload/v1690000000/sample.mp4", // <-- CAMBIA ESTO POR TU LINK REAL
+    video: "https://res.cloudinary.com/df1cdbvxm/video/upload/v1775103546/Premium_c97dsk.mp4", // <-- CAMBIA ESTO POR TU LINK REAL
     desc: "La experiencia definitiva. Exclusividad total y diseño a la medida para un evento inolvidable.",
     features: [
       "Todo lo del Paquete Pro",
