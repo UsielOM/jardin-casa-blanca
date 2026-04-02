@@ -11,7 +11,7 @@ export default function Footer({ onHomeClick }) {
           className="text-3xl font-serif font-bold text-gold tracking-widest uppercase mb-4 cursor-pointer" 
           onClick={onHomeClick}
         >
-          Jardín Casa Blanca
+          Jardín Casa Blanca NECAXA
         </div>
         
         <p className="text-gray-500 font-bold mb-10 italic">
@@ -48,7 +48,7 @@ export default function Footer({ onHomeClick }) {
         
         {/* Copyright */}
         <div className="text-[10px] text-gray-400 font-bold tracking-[0.3em] uppercase">
-          © {new Date().getFullYear()} JARDÍN CASA BLANCA. TODOS LOS DERECHOS RESERVADOS.
+          © {new Date().getFullYear()} JARDÍN CASA BLANCA NECAXA. TODOS LOS DERECHOS RESERVADOS.
         </div>
       </div>
     </footer>

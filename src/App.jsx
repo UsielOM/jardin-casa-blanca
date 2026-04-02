@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import HomeSelection from './views/HomeSelection';
 import SalonView from './views/SalonView';
 import CabinView from './views/CabinView';
+import PersonalizedInvitationView from './views/personalizedInvitationView'
 
 export default function App() {
   // --- ESTADOS GLOBALES DE NAVEGACIÓN ---
@@ -69,6 +70,9 @@ export default function App() {
 
         {activeFlow === 'cabana' && (
           <CabinView />
+        )}
+        {activeFlow === 'personalizedInvitationView' && (
+          <PersonalizedInvitationView />
         )}
       </main>
 

@@ -23,13 +23,21 @@ export default function Navbar({
     }`}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 flex justify-between items-center">
         
-        {/* LOGO */}
+        {/* LOGO MEJORADO VISUALMENTE (Centrado, abajo y en dorado) */}
         <div 
-          className="text-xl md:text-2xl font-serif font-bold text-gold uppercase tracking-tighter cursor-pointer flex items-center gap-2" 
+          className="cursor-pointer flex items-center gap-2" 
           onClick={() => onFlowSelect('none')}
         >
-          {activeFlow !== 'none' && <ChevronLeft className="w-5 h-5 lg:hidden" />}
-          Jardín Casa Blanca
+          {activeFlow !== 'none' && <ChevronLeft className="w-5 h-5 text-gold lg:hidden" />}
+          
+          <div className="flex flex-col items-center justify-center text-center">
+            <span className="text-xl md:text-2xl font-serif font-bold text-gold uppercase tracking-tighter leading-none">
+              Jardín Casa Blanca
+            </span>
+            <span className="text-[10px] md:text-[12px] font-sans font-bold text-gold uppercase tracking-[0.4em] leading-none mt-1.5">
+              Necaxa
+            </span>
+          </div>
         </div>
 
         {/* MENÚ DESKTOP */}

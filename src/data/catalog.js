@@ -26,19 +26,19 @@ export const inflatablesProviders = [
       {
         id: "inf1-1",
         name: "Paquete de 3 Inflables de agua",
-        price: 1000,
+        price: 1200,
         img: "/img/inflables/proveedor 1/paquete3.webp",
       },
       {
         id: "inf1-2",
         name: "Inflable de Agua",
-        price: 1000,
+        price: 600,
         img: "/img/inflables/proveedor 1/inflable-agua-paquete.webp",
       },
       {
         id: "inf1-3",
         name: "Inflable Jirafas",
-        price: 1200,
+        price: 600,
         img: "/img/inflables/proveedor 1/inflable-jirafas-paquete.webp",
       },
       {
@@ -57,13 +57,13 @@ export const inflatablesProviders = [
       {
         id: "inf2-1",
         name: "Inflable 2.1",
-        price: 800,
+        price: 1500,
         img: "/img/inflables/proveedor 2/proveedor-2.1.webp",
       },
       {
         id: "inf2-2",
         name: "Inflable 2.2",
-        price: 850,
+        price: 1500,
         img: "/img/inflables/proveedor 2/proveedor-2.2.jpeg",
       },
     ],
@@ -76,43 +76,43 @@ export const inflatablesProviders = [
       {
         id: "inf3-1",
         name: "Inflable Avenger",
-        price: 900,
+        price: 1000,
         img: "/img/inflables/proveedor 3/900-avenger.webp",
       },
       {
         id: "inf3-2",
         name: "Inflable Frozen",
-        price: 900,
+        price: 1000,
         img: "/img/inflables/proveedor 3/900-frozen.webp",
       },
       {
         id: "inf3-3",
         name: "Inflable Máscara",
-        price: 900,
+        price: 1000,
         img: "/img/inflables/proveedor 3/900-mascara.webp",
       },
       {
         id: "inf3-4",
         name: "Inflable Princesas",
-        price: 900,
+        price: 1200,
         img: "/img/inflables/proveedor 3/900-princesas.webp",
       },
       {
         id: "inf3-5",
         name: "Castillo Amarillo",
-        price: 1200,
+        price: 1400,
         img: "/img/inflables/proveedor 3/1200-castillo-amarillo.webp",
       },
       {
         id: "inf3-6",
         name: "Inflable Mario Bros",
-        price: 1200,
+        price: 1400,
         img: "/img/inflables/proveedor 3/1200-mario.webp",
       },
       {
         id: "inf3-7",
         name: "Inflable Paw Patrol",
-        price: 1200,
+        price: 1400,
         img: "/img/inflables/proveedor 3/1200-pawpatrol.webp",
       },
       {
@@ -142,7 +142,7 @@ export const inflatablesProviders = [
       {
         id: "inf3-12",
         name: "Inflable Azul",
-        price: 1800,
+        price: 1900,
         img: "/img/inflables/proveedor 3/1800-inflable-azul.webp",
       },
     ],
@@ -155,7 +155,7 @@ export const inflatablesProviders = [
       {
         id: "inf4-1",
         name: "Brincolín Amarillo",
-        price: 900,
+        price: 1000,
         img: "/img/inflables/proveedor 4/900-brincolin-amarillo.webp",
       },
       {
@@ -179,44 +179,44 @@ export const inflatablesProviders = [
     products: [
       {
         id: "inf5-1",
-        name: "Barco Acostado",
-        price: 1500,
+        name: "Barco",
+        price: 1400,
         img: "/img/inflables/proveedor 5/barco-acostado.webp",
       },
       {
         id: "inf5-2",
         name: "Bichos Oruga",
-        price: 1100,
+        price: 1200,
         img: "/img/inflables/proveedor 5/bichos-oruga.webp",
       },
       {
         id: "inf5-3",
         name: "Frozen Inflable",
-        price: 1200,
+        price: 1400,
         img: "/img/inflables/proveedor 5/frozen-inflable.webp",
       },
       {
         id: "inf5-4",
-        name: "Godopop",
-        price: 1000,
+        name: "Casa morada con azul",
+        price: 1200,
         img: "/img/inflables/proveedor 5/godopop.webp",
       },
       {
         id: "inf5-5",
         name: "Micky Car",
-        price: 1300,
+        price: 1200,
         img: "/img/inflables/proveedor 5/micky-car.webp",
       },
       {
         id: "inf5-6",
         name: "Minnie",
-        price: 1300,
+        price: 1100,
         img: "/img/inflables/proveedor 5/minnie.webp",
       },
       {
         id: "inf5-7",
         name: "Trampolín Azul",
-        price: 800,
+        price: 1000,
         img: "/img/inflables/proveedor 5/trampolin-azul.webp",
       },
     ],
@@ -237,7 +237,7 @@ export const soundData = [
       {
         id: "s2-p1",
         name: "Paquete silver",
-        price: 6000,
+        price: 6200,
         video:
           "https://res.cloudinary.com/dnopl3t98/video/upload/v1774245331/video_3_sin_marca_k15ohu.mp4",
         includes: [
@@ -257,7 +257,7 @@ export const soundData = [
       {
         id: "s2-p2",
         name: "PAQUETE GOLD ",
-        price: 8000,
+        price: 8200,
         video:
           "https://res.cloudinary.com/dnopl3t98/video/upload/v1774245333/1_sin_marca_r0te3w.mp4",
         includes: [
@@ -278,7 +278,7 @@ export const soundData = [
       {
         id: "s2-p3",
         name: "PAQUETE PLATINUM",
-        price: 10000,
+        price: 10200,
         video:
           "https://res.cloudinary.com/dnopl3t98/video/upload/v1774246925/WhatsApp_Video_2026-03-23_at_12.18.14_AM_kyj2aq.mp4",
         includes: [
@@ -302,7 +302,7 @@ export const soundData = [
       {
         id: "s2-p4",
         name: "PAQUETE DIAMANTE",
-        price: 16000,
+        price: 16200,
         video:
           "https://res.cloudinary.com/dnopl3t98/video/upload/v1773901238/1_pf4tuy.mp4",
         includes: [
@@ -478,6 +478,6 @@ export const cabinData = {
     "Amplio espacio de jardín",
   ],
   schedule: "Entrada: 12:00 PM | Salida: 12:00 PM",
-  policy: "Al llegar se hará un recorrido y entrega de inventario...",
+  policy: "Al llegar se hará un recorrido, entrega de inventario de lo que se esta entregando, se debera firmar un contrato en donde se estableceran terminos y condiciones de uso de las instalaciones, de igual forma el ultimo dia de su visita se volvera a realizar el conteo de inventario y debera coincidir con el primer inventario.",
   img: "/img/cabaña/cabaña-luz.webp",
 };
