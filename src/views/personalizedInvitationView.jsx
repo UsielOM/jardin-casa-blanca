@@ -71,15 +71,15 @@ export default function PersonalizedInvitationView() {
     };
   }, [modalPackage]);
 
-  // Generador del mensaje de WhatsApp
+  // Generador del mensaje de WhatsApp (ACTUALIZADO CON TUS NUEVOS MENSAJES)
   const sendWhatsApp = () => {
-    let msg = `✨ *Hola Jardín Casa Blanca!* ✨\n\nMe interesa el servicio de *Invitaciones Digitales Personlizadas*.\n`;
+    let msg = `✨ *Hola Jardín Casa Blanca!* ✨\n\n`;
     
     if (selectedPackage) {
-      msg += `\nMe gustó mucho el *${selectedPackage}*.\n`;
+      msg += `Me interesa el servicio de *Invitaciones Digitales Personalizadas* y me interesa este paquete: *${selectedPackage}*.\n\n`;
+    } else {
+      msg += `Me interesa el servicio de *Invitaciones Digitales Personalizadas*, pero tengo dudas sobre cómo es el servicio.\n\n¿Me podrían ayudar con más información, por favor? 📱✨`;
     }
-    
-    msg += `\n¿Me podrían compartir el formulario para llenar los datos de mi evento, por favor? 📱✨`;
     
     window.open(`https://wa.me/525523091732?text=${encodeURIComponent(msg)}`, "_blank");
   };

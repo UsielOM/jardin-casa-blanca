@@ -18,10 +18,13 @@ const CUBRE_COLORS = [
   "Azul Rey", "Amarillo Girasol", "Vino", "Menta", "Tenangos"
 ];
 
+// --- NUEVA ORGANIZACIÓN DE SNACKS ---
 const SNACKS_OPTS = {
-  botanas: ["Papas naturales", "Papas Flamin hot", "Papas Con queso", "Chicharrón ventana", "Chicharrón rueda"],
+  papas: ["Papas naturales", "Papas Flamin hot", "Papas Con queso"],
+  chicharrones: ["Chicharrón ventana", "Chicharrón rueda"],
   gomitas: ["Panditas", "Viborita", "Enchiladas", "Frutita", "Normales", "Donitas"],
-  semillas: ["Cacahuates japoneses", "Cacahuates salados", "Cacahuates enchilados"]
+  semillas: ["Cacahuates japoneses", "Cacahuates salados", "Cacahuates enchilados"],
+  verduras: ["Pepino", "Jícama", "Zanahoria"]
 };
 
 const HOTCAKES_OPTS = {
@@ -137,7 +140,8 @@ export default function SalonView() {
     },
     inflatables: [],
     music: [], 
-    snacks: { active: false, botanas: [], gomitas: [], semillas: [], cueritos: false },
+    // ESTADOS ACTUALIZADOS (papas y chicharrones son string, no array)
+    snacks: { active: false, qty: 1, papas: "", chicharrones: "", gomitas: [], semillas: [], verduras: [], cueritos: false },
     hotcakes: { active: false, normalQty: 0, fruitQty: 0, liquidos: [], granel: [], galletas: [], fruta: [] }
   });
   
@@ -207,6 +211,21 @@ export default function SalonView() {
     }));
   };
 
+  // --- NUEVA FUNCIÓN PARA SELECCIÓN ÚNICA (PAPAS Y CHICHARRONES) ---
+  const setSnackRadio = (category, item) => {
+    setSelections(prev => {
+      // Si el item ya está seleccionado, lo deselecciona. Si no, lo asigna.
+      const isSelected = prev.snacks[category] === item;
+      return { 
+        ...prev, 
+        snacks: { 
+          ...prev.snacks, 
+          [category]: isSelected ? "" : item 
+        } 
+      };
+    });
+  };
+
   const toggleSnackOption = (category, item, max) => {
     setSelections(prev => {
       const currentList = prev.snacks[category];
@@ -240,7 +259,12 @@ export default function SalonView() {
     return nights > 0 ? nights : 1;
   };
 
-  // --- CÁLCULO DE HOT CAKES (N ÓRDENES x PRECIO) ---
+  // --- CÁLCULOS SUBTOTALES ---
+  const getSnacksSubtotal = () => {
+    if (!selections.snacks.active) return 0;
+    return selections.snacks.qty * 60;
+  };
+
   const getHotcakesSubtotal = () => {
     if (!selections.hotcakes.active) return 0;
     const costoNormales = selections.hotcakes.normalQty * 20;
@@ -253,7 +277,7 @@ export default function SalonView() {
     Object.keys(selections.tables).forEach((k) => {
       if (selections.tables[k].active) total += selections.tables[k].mantelQty * 100 + selections.tables[k].cubreQty * 110;
     });
-    if (selections.snacks.active) total += 1200;
+    total += getSnacksSubtotal();
     total += getHotcakesSubtotal();
     selections.inflatables.forEach((i) => (total += i.price));
     selections.music.forEach((m) => (total += m.price));
@@ -278,11 +302,15 @@ export default function SalonView() {
       }
     });
 
-    if (selections.snacks.active) {
-      msg += `\n🍪 *BARRA DE SNACKS* ($1,200 MXN)\n`;
-      if(selections.snacks.botanas.length) msg += `  - Botanas: ${selections.snacks.botanas.join(', ')}\n`;
+    if (selections.snacks.active && getSnacksSubtotal() > 0) {
+      msg += `\n🍪 *BARRA DE SNACKS* ($${getSnacksSubtotal()} MXN)\n`;
+      msg += `  - Cantidad: ${selections.snacks.qty} órdenes\n`;
+      // Lectura de variables individuales
+      if(selections.snacks.papas) msg += `  - Papas: ${selections.snacks.papas}\n`;
+      if(selections.snacks.chicharrones) msg += `  - Chicharrón: ${selections.snacks.chicharrones}\n`;
       if(selections.snacks.gomitas.length) msg += `  - Gomitas: ${selections.snacks.gomitas.join(', ')}\n`;
       if(selections.snacks.semillas.length) msg += `  - Semillas: ${selections.snacks.semillas.join(', ')}\n`;
+      if(selections.snacks.verduras.length) msg += `  - Verduras: ${selections.snacks.verduras.join(', ')}\n`;
       if(selections.snacks.cueritos) msg += `  - Extras: Cueritos\n`;
     }
 
@@ -392,58 +420,137 @@ export default function SalonView() {
                 <div className="text-center mb-8">
                   <Cookie className="w-12 h-12 text-gold mx-auto mb-4" />
                   <h3 className="font-serif text-3xl text-gray-900 font-bold uppercase tracking-tight mb-2">Barra de Snacks</h3>
-                  <p className="text-gray-500 font-bold text-[10px] uppercase mt-2">Configura tu barra personalizada ($1,200 MXN)</p>
+                  <p className="text-gray-500 font-bold text-[10px] uppercase mt-2">Configura tu orden personalizada ($60 MXN por orden)</p>
                   
                   <button 
-                    onClick={() => setSelections(prev => ({...prev, snacks: {...prev.snacks, active: !prev.snacks.active}}))}
+                    onClick={() => setSelections(prev => ({
+                      ...prev, 
+                      snacks: {
+                        ...prev.snacks, 
+                        active: !prev.snacks.active,
+                        qty: !prev.snacks.active ? 20 : 0
+                      }
+                    }))}
                     className={`mt-6 w-full max-w-xs py-3 font-bold text-xs uppercase transition-all rounded-sm mx-auto ${selections.snacks.active ? 'bg-gold text-white border-2 border-gold shadow-lg' : 'bg-transparent text-gold border-2 border-gold hover:bg-gold/10'}`}
                   >
                     {selections.snacks.active ? '✓ Barra Agregada' : 'Agregar Barra'}
                   </button>
                 </div>
 
-                {/* Renderizado condicional: Solo aparece si está activo */}
                 {selections.snacks.active && (
-                  <div className="flex-grow border border-gray-200 rounded p-6 bg-gray-50 animate-fade-in">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-8">
-                        <div>
-                          <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4"><span>Botanas (2 Máx)</span> <span>{selections.snacks.botanas.length}/2</span></div>
-                          <div className="flex flex-col gap-2">
-                            {SNACKS_OPTS.botanas.map(b => (
-                              <button key={b} onClick={() => toggleSnackOption('botanas', b, 2)} className={`p-2 text-xs font-bold text-left border rounded-sm transition-colors ${selections.snacks.botanas.includes(b) ? 'border-gold text-gray-900 shadow-sm bg-white' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{b}</button>
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4"><span>Semillas (2 Máx)</span> <span>{selections.snacks.semillas.length}/2</span></div>
-                          <div className="flex flex-col gap-2">
-                            {SNACKS_OPTS.semillas.map(s => (
-                              <button key={s} onClick={() => toggleSnackOption('semillas', s, 2)} className={`p-2 text-xs font-bold text-left border rounded-sm transition-colors ${selections.snacks.semillas.includes(s) ? 'border-gold text-gray-900 shadow-sm bg-white' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{s}</button>
-                            ))}
-                          </div>
-                        </div>
+                  <div className="flex-grow flex flex-col animate-fade-in">
+                    
+                    <div className="flex justify-between items-center p-4 bg-white border border-gray-200 rounded shadow-sm mb-6">
+                      <span className="text-xs font-bold text-gray-700 uppercase tracking-widest">Órdenes de Snacks</span>
+                      <div className="flex items-center border rounded bg-gray-50 overflow-hidden h-10 border-gray-300">
+                        <button 
+                          onClick={() => setSelections(prev => ({
+                            ...prev, 
+                            snacks: { ...prev.snacks, qty: Math.max(0, prev.snacks.qty - 20) }
+                          }))} 
+                          className="px-4 text-gold font-bold text-lg hover:bg-gray-200 transition-colors"
+                        >
+                          -
+                        </button>
+                        <span className="w-12 text-center font-bold text-gray-900 text-sm">{selections.snacks.qty}</span>
+                        <button 
+                          onClick={() => setSelections(prev => ({
+                            ...prev, 
+                            snacks: { ...prev.snacks, qty: Math.min(200, prev.snacks.qty + 20) }
+                          }))} 
+                          className="px-4 text-gold font-bold text-lg hover:bg-gray-200 transition-colors"
+                        >
+                          +
+                        </button>
                       </div>
+                    </div>
 
-                      <div className="space-y-8">
-                        <div>
-                          <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4"><span>Gomitas (4 Máx)</span> <span>{selections.snacks.gomitas.length}/4</span></div>
-                          <div className="grid grid-cols-2 gap-2">
-                            {SNACKS_OPTS.gomitas.map(g => (
-                              <button key={g} onClick={() => toggleSnackOption('gomitas', g, 4)} className={`p-2 text-[10px] font-bold text-center border rounded-sm transition-colors ${selections.snacks.gomitas.includes(g) ? 'bg-gold border-gold text-white shadow-sm' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{g}</button>
-                            ))}
+                    <div className="flex-grow border border-gray-200 rounded p-6 bg-gray-50">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-8">
+                          
+                          {/* SECCIÓN PAPAS (Radio Button - Única Selección) */}
+                          <div>
+                            <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">
+                              <span>Papas (Elige 1)</span> 
+                              <span>{selections.snacks.papas ? '1/1' : '0/1'}</span>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              {SNACKS_OPTS.papas.map(p => (
+                                <button 
+                                  key={p} 
+                                  onClick={() => setSnackRadio('papas', p)} 
+                                  className={`p-2 text-xs font-bold text-left border rounded-sm transition-colors ${selections.snacks.papas === p ? 'border-gold text-gray-900 shadow-sm bg-white' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}
+                                >
+                                  {p}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          {/* SECCIÓN CHICHARRONES (Radio Button - Única Selección) */}
+                          <div>
+                            <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">
+                              <span>Chicharrones (Elige 1)</span> 
+                              <span>{selections.snacks.chicharrones ? '1/1' : '0/1'}</span>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              {SNACKS_OPTS.chicharrones.map(c => (
+                                <button 
+                                  key={c} 
+                                  onClick={() => setSnackRadio('chicharrones', c)} 
+                                  className={`p-2 text-xs font-bold text-left border rounded-sm transition-colors ${selections.snacks.chicharrones === c ? 'border-gold text-gray-900 shadow-sm bg-white' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}
+                                >
+                                  {c}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* SECCIÓN SEMILLAS */}
+                          <div>
+                            <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4"><span>Semillas (2 Máx)</span> <span>{selections.snacks.semillas.length}/2</span></div>
+                            <div className="flex flex-col gap-2">
+                              {SNACKS_OPTS.semillas.map(s => (
+                                <button key={s} onClick={() => toggleSnackOption('semillas', s, 2)} className={`p-2 text-xs font-bold text-left border rounded-sm transition-colors ${selections.snacks.semillas.includes(s) ? 'border-gold text-gray-900 shadow-sm bg-white' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{s}</button>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                        <div>
-                          <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Extras</div>
-                          <button 
-                            onClick={() => setSelections(prev => ({...prev, snacks: {...prev.snacks, cueritos: !prev.snacks.cueritos}}))}
-                            className={`w-full p-3 text-xs font-bold text-center border rounded-sm transition-colors ${selections.snacks.cueritos ? 'bg-gold border-gold text-white shadow-sm' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}
-                          >
-                            {selections.snacks.cueritos ? '✓ Cueritos' : 'Cueritos'}
-                          </button>
+
+                        <div className="space-y-8">
+                          <div>
+                            <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4"><span>Gomitas (2 Máx)</span> <span>{selections.snacks.gomitas.length}/2</span></div>
+                            <div className="grid grid-cols-2 gap-2">
+                              {SNACKS_OPTS.gomitas.map(g => (
+                                <button key={g} onClick={() => toggleSnackOption('gomitas', g, 2)} className={`p-2 text-[10px] font-bold text-center border rounded-sm transition-colors ${selections.snacks.gomitas.includes(g) ? 'bg-gold border-gold text-white shadow-sm' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{g}</button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                             <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4"><span>Verduras (Hasta 3)</span> <span>{selections.snacks.verduras.length}/3</span></div>
+                             <div className="grid grid-cols-1 gap-2">
+                               {SNACKS_OPTS.verduras.map(v => (
+                                 <button key={v} onClick={() => toggleSnackOption('verduras', v, 3)} className={`p-2 text-xs font-bold text-left border rounded-sm transition-colors ${selections.snacks.verduras.includes(v) ? 'border-gold text-gray-900 shadow-sm bg-white' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}>{v}</button>
+                               ))}
+                             </div>
+                          </div>
+
+                          <div>
+                            <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Extras</div>
+                            <button 
+                              onClick={() => setSelections(prev => ({...prev, snacks: {...prev.snacks, cueritos: !prev.snacks.cueritos}}))}
+                              className={`w-full p-3 text-xs font-bold text-center border rounded-sm transition-colors ${selections.snacks.cueritos ? 'bg-gold border-gold text-white shadow-sm' : 'border-gray-200 text-gray-500 bg-white hover:border-gold/50'}`}
+                            >
+                              {selections.snacks.cueritos ? '✓ Cueritos' : 'Cueritos'}
+                            </button>
+                          </div>
                         </div>
                       </div>
+                    </div>
+                    <div className="mt-8 text-center bg-gray-50 p-4 rounded border border-gray-200">
+                       <p className="font-serif text-3xl text-gold font-bold">Subtotal Snacks: ${selections.snacks.qty * 60} MXN</p>
                     </div>
                   </div>
                 )}
@@ -479,14 +586,13 @@ export default function SalonView() {
                         <div key={item.f} className="flex justify-between items-center gap-4 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
                           <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">{item.l} <span className="text-[9px] text-gray-400 block">(${item.p} x orden)</span></span>
                           
-                          {/* LÓGICA DE LIMITE COMPARTIDO DE 200 ÓRDENES EN TOTAL */}
                           <div className="flex items-center border rounded-sm bg-gray-50 overflow-hidden h-10 border-gray-300">
                             <button onClick={() => setSelections(prev => ({...prev, hotcakes: {...prev.hotcakes, [item.f]: Math.max(0, prev.hotcakes[item.f] - 10)}}))} className="px-4 text-gold font-bold text-lg hover:bg-gray-200 transition-colors">-</button>
                             <span className="w-8 text-center font-bold text-gray-900 text-sm">{selections.hotcakes[item.f]}</span>
                             <button 
                               onClick={() => setSelections(prev => {
                                 const totalOrdenes = prev.hotcakes.normalQty + prev.hotcakes.fruitQty;
-                                if (totalOrdenes >= 200) return prev; // El límite conjunto es 200
+                                if (totalOrdenes >= 200) return prev; 
                                 return {
                                   ...prev, 
                                   hotcakes: {
@@ -547,7 +653,7 @@ export default function SalonView() {
                     )}
 
                     <div className="mt-8 text-center bg-gray-50 p-4 rounded border border-gray-200">
-                      <p className="font-serif text-3xl text-gold font-bold">Subtotal: ${getHotcakesSubtotal()} MXN</p>
+                      <p className="font-serif text-3xl text-gold font-bold">Subtotal Hotcakes: ${getHotcakesSubtotal()} MXN</p>
                     </div>
                   </div>
                 )}
@@ -771,18 +877,33 @@ export default function SalonView() {
                      })}
 
                      {/* RESUMEN SERVICIOS DE CASA */}
-                     {selections.snacks.active && <p className="flex justify-between items-center text-xs pt-4 border-t border-gray-200"><span>🍪 BARRA DE SNACKS</span> <span>$1,200</span></p>}
+                     {selections.snacks.active && <p className="flex justify-between items-center text-xs pt-4 border-t border-gray-200"><span>🍪 BARRA DE SNACKS ({selections.snacks.qty} Órd.)</span> <span>${getSnacksSubtotal()}</span></p>}
                      {getHotcakesSubtotal() > 0 && <p className="flex justify-between items-center text-xs pt-4 border-t border-gray-200"><span>🥞 BARRA DE HOT CAKES</span> <span>${getHotcakesSubtotal()}</span></p>}
 
                      {selections.inflatables.map(i => <div key={i.id} className="pt-4 border-t border-gray-200 flex justify-between items-center text-xs"><span>🎈 {i.name}</span> <span>${i.price}</span></div>)}
                      {selections.music.map(m => <div key={m.packageId} className="pt-4 border-t border-gray-200 flex justify-between items-center text-xs"><span>🎵 {m.providerName}: {m.packageName}</span> <span>${m.price}</span></div>)}
                      {cabinConfig.rent && <div className="pt-4 border-t border-gold/20 bg-gold/5 p-4 rounded mt-4 flex justify-between items-center font-bold"><span>🏡 Cabaña VIP ({getCabinNights()} Noches)</span> <span>${cabinData.price * cabinConfig.guests * getCabinNights()}</span></div>}
                   </div>
+
+                  {/* --- NUEVO MENSAJE PROMOCIONAL --- */}
+                  <div className="mt-8 pt-6 border-t border-gray-200">
+                    <div className="bg-gold/10 border border-gold/30 p-4 rounded-sm text-[11px] leading-relaxed text-gray-700 font-medium">
+                      <p className="mb-2">
+                        🎁 <strong className="text-gold uppercase tracking-widest">Beneficio Especial:</strong> Al contratar un servicio de barra, obtienes <strong>1 hora gratis</strong> para tu evento en nuestro salon.
+                      </p>
+                      <p className="mb-2">
+                      Tambien al contratar un servico con nosotros tienes un 30% de descuento en tus Invitaciones Digitales.
+                      </p>
+                      <p className="text-[10px] text-gray-500 italic">
+                        ⚠️ Nota: Promociones válidas únicamente contratando a través de nuestros medios oficiales (esta página web y nuestras redes sociales).
+                      </p>
+                    </div>
+                  </div>
+                  {/* ------------------------------- */}
                 </div>
                 <div className="bg-[#2A2A2A] text-white p-10 text-center rounded-sm shadow-2xl">
                   <p className="font-serif text-6xl md:text-8xl text-gold font-bold mb-4">${totalEstimadoSalon()}</p>
                   
-                  {/* --- NOTA DE DISPONIBILIDAD --- */}
                   <p className="text-[11px] text-white/60 italic mb-6 px-2 leading-relaxed">
                     * El precio final se validará por mensaje, ya que bandas e inflables están sujetos a disponibilidad.
                   </p>
@@ -799,89 +920,12 @@ export default function SalonView() {
 
       {/* --- MODAL EMERGENTE --- */}
       {selectedMusicPackage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-10 bg-black/95 animate-fade-in" onClick={() => setSelectedMusicPackage(null)}>
-          <div 
-            className="relative bg-[#1A1A1A] text-white border border-gold/30 rounded-sm shadow-[0_0_100px_rgba(197,160,89,0.2)] w-full max-w-5xl max-h-full flex flex-col animate-pop-in overflow-hidden" 
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-6 md:p-8 border-b border-white/10 flex justify-between items-center bg-[#1A1A1A]">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gold/10 rounded-full flex items-center justify-center text-gold border border-gold/20">
-                  <Trophy className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-serif text-2xl md:text-4xl font-bold uppercase tracking-tight text-white leading-none">
-                    {selectedMusicPackage.package.name}
-                  </h3>
-                  <p className="text-[10px] font-bold text-gold uppercase tracking-[0.3em] mt-2">
-                    {selectedMusicPackage.provider.name}
-                  </p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setSelectedMusicPackage(null)} 
-                className="p-2 hover:bg-white/5 rounded-full text-gray-400 hover:text-white transition-all"
-              >
-                <X className="w-8 h-8" />
-              </button>
-            </div>
-
-            <div className="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-10">
-              <div className="flex flex-col lg:flex-row gap-10">
-                <div className="lg:w-1/3 flex flex-col gap-4">
-                   <div className="aspect-[9/16] bg-black rounded-sm overflow-hidden border border-white/10 shadow-2xl relative group">
-                      <video className="w-full h-full object-cover z-20 relative" controls playsInline key={selectedMusicPackage.package.video} ref={(el) => { if (el) el.volume = 0.1; }}>
-                        <source src={selectedMusicPackage.package.video} type="video/mp4" />
-                      </video>
-                   </div>
-                </div>
-
-                <div className="lg:w-2/3">
-                   <h4 className="font-serif text-xl font-bold text-gold mb-8 uppercase tracking-[0.2em] border-b border-gold/20 pb-4 inline-block">
-                     Servicios Exclusivos Incluidos:
-                   </h4>
-                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
-                     {selectedMusicPackage.package.includes.map((i, idx) => (
-                       <div key={idx} className="flex gap-3 items-start group">
-                         <CheckCircle className="w-5 h-5 text-gold flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" /> 
-                         <span className="uppercase tracking-widest text-[11px] text-gray-300 font-bold leading-relaxed group-hover:text-white transition-colors">
-                           {i}
-                         </span>
-                       </div>
-                     ))}
-                   </div>
-                   
-                   <div className="mt-12 p-6 bg-gold/5 border border-gold/10 rounded-sm">
-                      <p className="text-[16px] text-gray-400 italic leading-relaxed">
-                        * Todos los paquetes están sujetos a disponibilidad. Para más detalles o solicitudes especiales, no dudes en contactarnos.
-                      </p>
-                   </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-8 border-t border-white/10 bg-[#1A1A1A] flex flex-col sm:flex-row justify-between items-center gap-8">
-              <div className="text-center sm:text-left">
-                <p className="text-[10px] text-gray-400 uppercase tracking-[0.3em] mb-1 font-bold">Total del Paquete Seleccionado</p>
-                <div className="flex items-baseline gap-2">
-                  <span className="font-serif text-5xl font-bold text-gold">${selectedMusicPackage.package.price}</span>
-                  <span className="text-xs text-gray-500 font-bold">MXN</span>
-                </div>
-              </div>
-              
-              <button 
-                onClick={() => { toggleMusicPackage(selectedMusicPackage.provider, selectedMusicPackage.package); setSelectedMusicPackage(null); }} 
-                className={`w-full sm:w-auto px-12 py-5 rounded-sm text-xs font-bold uppercase tracking-[0.3em] transition-all duration-500 shadow-2xl ${
-                  selections.music.find(m => m.packageId === selectedMusicPackage.package.id)
-                    ? 'bg-transparent border-2 border-white/20 text-white hover:bg-white/5' 
-                    : 'bg-gold border-2 border-gold text-white hover:bg-gold/80 hover:scale-105'
-                }`}
-              >
-                {selections.music.find(m => m.packageId === selectedMusicPackage.package.id) ? '✓ Quitar de la lista' : 'Agregar este Plan'}
-              </button>
-            </div>
-          </div>
-        </div>
+        <MusicDetailsModal 
+          data={selectedMusicPackage} 
+          onClose={() => setSelectedMusicPackage(null)} 
+          onSelect={toggleMusicPackage}
+          isSelected={selections.music.some(m => m.packageId === selectedMusicPackage.package.id)}
+        />
       )}
     </>
   );

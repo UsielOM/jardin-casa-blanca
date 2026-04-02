@@ -13,7 +13,7 @@ export default function LocationMap() {
             <div className="flex items-start gap-6">
               <MapPin className="w-8 h-8 text-gold flex-shrink-0 mt-1" />
               <p className="text-gray-900 text-xl font-bold leading-tight">
-                Jardín Casa Blanca<br/>
+                Jardín Casa Blanca Necaxa<br/>
                 <span className="text-gray-500 text-base font-bold uppercase tracking-widest">Necaxa, Puebla</span>
               </p>
             </div>

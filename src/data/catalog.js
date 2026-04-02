@@ -304,7 +304,7 @@ export const soundData = [
         name: "PAQUETE DIAMANTE",
         price: 16200,
         video:
-          "https://res.cloudinary.com/dnopl3t98/video/upload/v1773901238/1_pf4tuy.mp4",
+          "https://res.cloudinary.com/dnopl3t98/video/upload/v1774245328/2_diotju.mp4",
         includes: [
           "Souvenirs (globos, sombreros, collares, banderas)",
           "Show La guerra de los 80's",
