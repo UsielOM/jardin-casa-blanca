@@ -303,7 +303,7 @@ export default function SalonView() {
     });
 
     if (selections.snacks.active && getSnacksSubtotal() > 0) {
-      msg += `\n🍪 *BARRA DE SNACKS* ($${getSnacksSubtotal()} MXN)\n`;
+      msg += `\n🍪 *BARRA DE SNACKS PREPARADAS* ($${getSnacksSubtotal()} MXN)\n`;
       msg += `  - Cantidad: ${selections.snacks.qty} órdenes\n`;
       // Lectura de variables individuales
       if(selections.snacks.papas) msg += `  - Papas: ${selections.snacks.papas}\n`;
@@ -419,7 +419,7 @@ export default function SalonView() {
               <div className="border border-gray-200 shadow-xl p-8 rounded flex flex-col transition-all hover:border-gold/50 bg-white">
                 <div className="text-center mb-8">
                   <Cookie className="w-12 h-12 text-gold mx-auto mb-4" />
-                  <h3 className="font-serif text-3xl text-gray-900 font-bold uppercase tracking-tight mb-2">Barra de Snacks</h3>
+                  <h3 className="font-serif text-3xl text-gray-900 font-bold uppercase tracking-tight mb-2">Barra de Snacks PREPARADAS </h3>
                   <p className="text-gray-500 font-bold text-[10px] uppercase mt-2">Configura tu orden personalizada ($60 MXN por pieza)</p>
                   
                   <button 
@@ -846,7 +846,7 @@ export default function SalonView() {
                 </div>
                 <div><label className="flex items-center gap-2 text-xs font-bold text-gray-700 mb-3 uppercase tracking-widest"><CalendarIcon className="w-4 h-4 text-gold" /> Fecha</label><input type="date" value={eventDate} onChange={e => setEventDate(e.target.value)} className="w-full border-b-2 border-gray-300 py-3 font-bold focus:border-gold outline-none" /></div>
                 <div className="bg-gray-50 p-8 border-2 border-gray-200 rounded-sm">
-                  <div className="flex items-center gap-4 border-b-2 border-gray-200 pb-5"><CheckCircle className="w-8 h-8 text-gold" /><span className="font-serif text-3xl font-bold">Base Salón - $2,500</span></div>
+                  <div className="flex items-center gap-4 border-b-2 border-gray-200 pb-5"><CheckCircle className="w-8 h-8 text-gold" /><span className="font-serif text-3xl font-bold">Base Salón - $2,500 por 6 horas de evento, mas sus horas extras pagadas y 1 hora para desalojar sin excepcion </span></div>
                   <div className="flex justify-between items-center gap-6 pt-4 text-gray-700 font-bold">
                     <span className="text-xs uppercase tracking-widest text-gray-500">Horas Extra ($250/h):</span>
                     <div className="flex items-center border-2 border-gray-300 rounded bg-white overflow-hidden shadow-sm h-12 w-32">
@@ -877,7 +877,7 @@ export default function SalonView() {
                      })}
 
                      {/* RESUMEN SERVICIOS DE CASA */}
-                     {selections.snacks.active && <p className="flex justify-between items-center text-xs pt-4 border-t border-gray-200"><span>🍪 BARRA DE SNACKS ({selections.snacks.qty} Órd.)</span> <span>${getSnacksSubtotal()}</span></p>}
+                     {selections.snacks.active && <p className="flex justify-between items-center text-xs pt-4 border-t border-gray-200"><span>🍪 BARRA DE SNACKS PREPARADAS ({selections.snacks.qty} Órd.)</span> <span>${getSnacksSubtotal()}</span></p>}
                      {getHotcakesSubtotal() > 0 && <p className="flex justify-between items-center text-xs pt-4 border-t border-gray-200"><span>🥞 BARRA DE HOT CAKES</span> <span>${getHotcakesSubtotal()}</span></p>}
 
                      {selections.inflatables.map(i => <div key={i.id} className="pt-4 border-t border-gray-200 flex justify-between items-center text-xs"><span>🎈 {i.name}</span> <span>${i.price}</span></div>)}

@@ -343,7 +343,7 @@ export const bandsData = [
     name: "Proveedor I Banda Norteña",
     mainVideo:
       "https://res.cloudinary.com/dnopl3t98/video/upload/v1774496244/WhatsApp_Video_2026-03-25_at_9.36.21_PM_bdgm9u.mp4",
-    description: "Somo un grupo musical de nueva generacion ayudanos a crecer y seguir tocando",
+    description: "Somos un grupo musical de nueva generacion ayudanos a crecer y seguir tocando",
     packages: [
       {
         id: "sb1-p1",
@@ -367,7 +367,7 @@ export const bandsData = [
     name: "Proveedor II Banda Norteña",
     mainVideo:
       "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499123/WhatsApp_Video_2026-03-25_at_10.16.45_PM_xauqce.mp4",
-    description: "Somo un grupo musical de norteño",
+    description: "Somos un grupo musical de norteño",
     packages: [
       {
         id: "sb1-p1",
@@ -406,7 +406,7 @@ export const bandsData = [
     name: "Proveedor III Banda Norteña",
     mainVideo:
       "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499766/WhatsApp_Video_2026-03-25_at_10.21.50_PM_lenmf1.mp4",
-    description: "Somo un grupo musical de norteño",
+    description: "Somos un grupo musical de norteño",
     packages: [
       {
         id: "sb1-p1",
