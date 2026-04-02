@@ -325,7 +325,7 @@ export default function SalonView() {
     }
 
     msg += `\n`;
-    selections.inflatables.forEach((i) => (msg += `🎈 ${i.name} - $${i.price} MXN\n`));
+    selections.inflatables.forEach((i) => (msg += `🎈 ${i.id}: ${i.name} - $${i.price} MXN\n`));
     selections.music.forEach((m) => (msg += `🎵 ${m.providerName}: ${m.packageName} - $${m.price} MXN\n`));
     if (cabinConfig.rent) msg += `🏡 Cabaña VIP (${getCabinNights()} noches) - $${cabinData.price * cabinConfig.guests * getCabinNights()} MXN\n`;
 
@@ -373,7 +373,7 @@ export default function SalonView() {
                         {t.active ? "✓ Seleccionada" : "Seleccionar este tipo"}
                       </button>
                       <div className="space-y-4 pt-6 border-t border-gray-100">
-                        {[ {f:'mantelQty', l:'CON MANTEL', p:100}, {f:'cubreQty', l:'CON CUBRE MANTEL', p:110} ].map(field => (
+                        {[ {f:'mantelQty', l:'CON MANTEL', p:100}, {f:'cubreQty', l:'CON MANTEL Y CUBRE MANTEL', p:110} ].map(field => (
                           <div key={field.f} className="flex flex-col gap-3 bg-gray-50 p-3 sm:p-4 rounded border border-gray-200">
                             <div className="flex justify-between items-center gap-2">
                               <div className="text-left min-w-0 flex-1">
@@ -420,7 +420,7 @@ export default function SalonView() {
                 <div className="text-center mb-8">
                   <Cookie className="w-12 h-12 text-gold mx-auto mb-4" />
                   <h3 className="font-serif text-3xl text-gray-900 font-bold uppercase tracking-tight mb-2">Barra de Snacks</h3>
-                  <p className="text-gray-500 font-bold text-[10px] uppercase mt-2">Configura tu orden personalizada ($60 MXN por orden)</p>
+                  <p className="text-gray-500 font-bold text-[10px] uppercase mt-2">Configura tu orden personalizada ($60 MXN por pieza)</p>
                   
                   <button 
                     onClick={() => setSelections(prev => ({
@@ -561,7 +561,7 @@ export default function SalonView() {
                 <div className="text-center mb-8">
                   <Coffee className="w-12 h-12 text-gold mx-auto mb-4" />
                   <h3 className="font-serif text-3xl text-gray-900 font-bold uppercase tracking-tight mb-2">Barra de Hot Cakes</h3>
-                  <p className="text-gray-500 font-bold text-[10px] uppercase mt-2">* Órdenes de 10 piezas (Máx. 200 órdenes en total)</p>
+                  <p className="text-gray-500 font-bold text-[10px] uppercase mt-2">* Cada Órden tiene 10 piezas (Máx. 200 órdenes)</p>
                   
                   <button 
                     onClick={() => setSelections(prev => ({

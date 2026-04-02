@@ -5,13 +5,13 @@ export const tablesData = [
   {
     id: "t1",
     name: "Mesa Redonda",
-    desc: "Clásica y perfecta para fomentar la conversación (10 personas).",
+    desc: "Clásica y perfecta para fomentar la conversación, incluye sillas.",
     img: "/img/mesas/mesa-circular.webp",
   },
   {
     id: "t2",
     name: "Mesa Rectangular",
-    desc: "Ideal para optimizar el espacio y acomodar grupos grandes.",
+    desc: "Ideal para optimizar el espacio y acomodar grupos grandes, incluye sillas.",
     img: "/img/mesas/mesa-rectangular.webp",
   },
 ];
@@ -56,13 +56,13 @@ export const inflatablesProviders = [
     products: [
       {
         id: "inf2-1",
-        name: "Inflable 2.1",
+        name: "Inflable de Princesas",
         price: 1500,
         img: "/img/inflables/proveedor 2/proveedor-2.1.webp",
       },
       {
         id: "inf2-2",
-        name: "Inflable 2.2",
+        name: "Inflable de castillo",
         price: 1500,
         img: "/img/inflables/proveedor 2/proveedor-2.2.jpeg",
       },
@@ -228,7 +228,7 @@ export const soundData = [
   {
     id: "s2", // Proveedor 2
     type: "Show y Animación",
-    name: "Provedor musical I",
+    name: "Proveedor musical I",
     mainVideo:
       "https://res.cloudinary.com/dnopl3t98/video/upload/v1774245328/2_diotju.mp4",
     description:
