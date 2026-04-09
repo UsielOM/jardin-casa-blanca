@@ -20,7 +20,7 @@ export const tablesData = [
 export const inflatablesProviders = [
   {
     id: "prov1",
-    name: "Proveedor 1",
+    name: "Proveedor - Mini brinquitos",
     description: "Paquetes temáticos de agua y jirafas.",
     products: [
       { id: "inf1-1", name: "Paquete de 3 Inflables de agua", price: 1200, img: "/img/inflables/proveedor 1/paquete3.webp" },
@@ -31,53 +31,53 @@ export const inflatablesProviders = [
   },
   {
     id: "prov2",
-    name: "Proveedor 2",
+    name: "Proveedor - Kalex",
     description: "Variedad de juegos clásicos.",
     products: [
-      { id: "inf2-1", name: "Inflable de Princesas", price: 1500, img: "/img/inflables/proveedor 2/proveedor-2.1.webp" },
-      { id: "inf2-2", name: "Inflable de castillo", price: 1500, img: "/img/inflables/proveedor 2/proveedor-2.2.jpeg" },
+      { id: "inf2-1", name: "Inflable de Princesas", price: 1100, img: "/img/inflables/proveedor 2/proveedor-2.1.webp" },
+      { id: "inf2-2", name: "Inflable de castillo", price: 1100, img: "/img/inflables/proveedor 2/proveedor-2.2.jpeg" },
     ],
   },
   {
     id: "prov3",
-    name: "Proveedor 3",
+    name: "Proveedor - Inflables Juniors",
     description: "Gran catálogo de personajes y tamaños.",
     products: [
-      { id: "inf3-1", name: "Inflable Avenger", price: 1000, img: "/img/inflables/proveedor 3/900-avenger.webp" },
-      { id: "inf3-2", name: "Inflable Frozen", price: 1000, img: "/img/inflables/proveedor 3/900-frozen.webp" },
-      { id: "inf3-3", name: "Inflable Máscara", price: 1000, img: "/img/inflables/proveedor 3/900-mascara.webp" },
-      { id: "inf3-4", name: "Inflable Princesas", price: 1200, img: "/img/inflables/proveedor 3/900-princesas.webp" },
-      { id: "inf3-5", name: "Castillo Amarillo", price: 1400, img: "/img/inflables/proveedor 3/1200-castillo-amarillo.webp" },
-      { id: "inf3-6", name: "Inflable Mario Bros", price: 1400, img: "/img/inflables/proveedor 3/1200-mario.webp" },
-      { id: "inf3-7", name: "Inflable Paw Patrol", price: 1400, img: "/img/inflables/proveedor 3/1200-pawpatrol.webp" },
-      { id: "inf3-8", name: "Inflable Arcos", price: 1400, img: "/img/inflables/proveedor 3/1400-arcos.webp" },
-      { id: "inf3-9", name: "Inflable Bluey", price: 1400, img: "/img/inflables/proveedor 3/1400-bluey.webp" },
-      { id: "inf3-10", name: "Inflable Dinosaurio", price: 1400, img: "/img/inflables/proveedor 3/1400-inflable-dinosaurio.webp" },
-      { id: "inf3-11", name: "Inflable Lineal", price: 1400, img: "/img/inflables/proveedor 3/1400-inflable-lineal.webp" },
-      { id: "inf3-12", name: "Inflable Azul", price: 1900, img: "/img/inflables/proveedor 3/1800-inflable-azul.webp" },
+      { id: "inf3-1", name: "Inflable Avenger", price: 700, img: "/img/inflables/proveedor 3/900-avenger.webp" },
+      { id: "inf3-2", name: "Inflable Frozen", price: 700, img: "/img/inflables/proveedor 3/900-frozen.webp" },
+      { id: "inf3-3", name: "Inflable Máscara", price: 700, img: "/img/inflables/proveedor 3/900-mascara.webp" },
+      { id: "inf3-4", name: "Inflable Princesas", price: 800, img: "/img/inflables/proveedor 3/900-princesas.webp" },
+      { id: "inf3-5", name: "Castillo Amarillo", price: 1000, img: "/img/inflables/proveedor 3/1200-castillo-amarillo.webp" },
+      { id: "inf3-6", name: "Inflable Mario Bros", price: 1000, img: "/img/inflables/proveedor 3/1200-mario.webp" },
+      { id: "inf3-7", name: "Inflable Paw Patrol", price: 1000, img: "/img/inflables/proveedor 3/1200-pawpatrol.webp" },
+      { id: "inf3-8", name: "Inflable Arcos", price: 1000, img: "/img/inflables/proveedor 3/1400-arcos.webp" },
+      { id: "inf3-9", name: "Inflable Bluey", price: 1000, img: "/img/inflables/proveedor 3/1400-bluey.webp" },
+      { id: "inf3-10", name: "Inflable Dinosaurio", price: 1100, img: "/img/inflables/proveedor 3/1400-inflable-dinosaurio.webp" },
+      { id: "inf3-11", name: "Inflable Lineal", price: 1100, img: "/img/inflables/proveedor 3/1400-inflable-lineal.webp" },
+      { id: "inf3-12", name: "Inflable Azul", price: 1600, img: "/img/inflables/proveedor 3/1800-inflable-azul.webp" },
     ],
   },
   {
     id: "prov4",
-    name: "Proveedor 4",
+    name: "Proveedor - La Chispa",
     description: "Brincolines y barcos.",
     products: [
-      { id: "inf4-1", name: "Brincolín Amarillo", price: 1000, img: "/img/inflables/proveedor 4/900-brincolin-amarillo.webp" },
-      { id: "inf4-2", name: "Inflable Morado", price: 1200, img: "/img/inflables/proveedor 4/1200-inflable-morado.webp" },
-      { id: "inf4-3", name: "Inflable Barco", price: 1400, img: "/img/inflables/proveedor 4/1400-inflable-barco.webp" },
+      { id: "inf4-1", name: "Brincolín Amarillo", price: 800, img: "/img/inflables/proveedor 4/900-brincolin-amarillo.webp" },
+      { id: "inf4-2", name: "Inflable Morado", price: 900, img: "/img/inflables/proveedor 4/1200-inflable-morado.webp" },
+      { id: "inf4-3", name: "Inflable Barco", price: 1000, img: "/img/inflables/proveedor 4/1400-inflable-barco.webp" },
     ],
   },
   {
     id: "prov5",
-    name: "Proveedor 5",
+    name: "Proveedor - Diversiones Yayo",
     description: "Catálogo ampliado de personajes.",
     products: [
-      { id: "inf5-1", name: "Barco", price: 1400, img: "/img/inflables/proveedor 5/barco-acostado.webp" },
-      { id: "inf5-2", name: "Bichos Oruga", price: 1200, img: "/img/inflables/proveedor 5/bichos-oruga.webp" },
-      { id: "inf5-3", name: "Frozen Inflable", price: 1400, img: "/img/inflables/proveedor 5/frozen-inflable.webp" },
-      { id: "inf5-4", name: "Casa morada con azul", price: 1200, img: "/img/inflables/proveedor 5/godopop.webp" },
-      { id: "inf5-5", name: "Micky Car", price: 1200, img: "/img/inflables/proveedor 5/micky-car.webp" },
-      { id: "inf5-6", name: "Minnie", price: 1100, img: "/img/inflables/proveedor 5/minnie.webp" },
+      { id: "inf5-1", name: "Barco", price: 950, img: "/img/inflables/proveedor 5/barco-acostado.webp" },
+      { id: "inf5-2", name: "Bichos Oruga", price: 1150, img: "/img/inflables/proveedor 5/bichos-oruga.webp" },
+      { id: "inf5-3", name: "Frozen Inflable", price: 1150, img: "/img/inflables/proveedor 5/frozen-inflable.webp" },
+      { id: "inf5-4", name: "Casa morada con azul", price: 850, img: "/img/inflables/proveedor 5/godopop.webp" },
+      { id: "inf5-5", name: "Micky Car", price: 750, img: "/img/inflables/proveedor 5/micky-car.webp" },
+      { id: "inf5-6", name: "Minnie", price: 750, img: "/img/inflables/proveedor 5/minnie.webp" },
       { id: "inf5-7", name: "Trampolín Azul", price: 1000, img: "/img/inflables/proveedor 5/trampolin-azul.webp" },
     ],
   },
@@ -99,7 +99,7 @@ export const soundData = [
   {
     id: "s2", 
     type: "Show y Animación",
-    name: "Proveedor musical I",
+    name: "KALEX",
     mainVideo: "https://res.cloudinary.com/dnopl3t98/video/upload/v1774245328/2_diotju.mp4",
     description: "Todos los paquetes tienen audio profesional, DJ en vivo, 5 horas de música continua + 2 de cortesía para música de fondo",
     packages: [
@@ -177,7 +177,7 @@ export const soundData = [
   {
     id: "s3",
     type: "Show y Animación",
-    name: "Proveedor musical II",
+    name: "SONIDO BKCA",
     mainVideo: "https://res.cloudinary.com/dnopl3t98/video/upload/q_auto/f_auto/v1775595553/VID-20260325-WA0007_1_z7mbml.mp4",
     description: "Todos los paquetes tienen 2 horas de musica de fondo para la comida",
     packages: [
@@ -241,7 +241,7 @@ export const soundData = [
   {
     id: "s4",
     type: "Show y Animación",
-    name: "Proveedor musical III",
+    name: "Obsession",
     mainVideo: "https://res.cloudinary.com/dnopl3t98/video/upload/q_auto/f_auto/v1775598920/Messenger_creation_38AAC1E0-EBDF-4B2E-9EBC-6533F7457113_wlprwt.mp4",
     description: "Lo mejor para tus eventos",
     packages: [
@@ -271,14 +271,14 @@ export const soundData = [
   {
     id: "s5",
     type: "Show y Animación",
-    name: "Proveedor musical IV",
+    name: "Sonido Luxor",
     mainVideo: "https://res.cloudinary.com/dnopl3t98/video/upload/q_auto/f_auto/v1775614882/InShot_20260325_230328741_jwaydy.mp4",
     description: "5 horas de baile mas 2 horas de musica suave para la comida",
     packages: [
       {
         id: "s5-p1",
         name: "Paquete chico",
-        price: 6000,
+        price: 5500,
         video: "https://res.cloudinary.com/dnopl3t98/video/upload/q_auto/f_auto/v1775614881/InShot_20260325_230618213_lhdpug.mp4",
         includes: [
           "2 Graves de piso",
@@ -294,7 +294,7 @@ export const soundData = [
       {
         id: "s5-p2",
         name: "Paquete Mediano",
-        price: 6500,
+        price: 6000,
         video: "https://res.cloudinary.com/dnopl3t98/video/upload/q_auto/f_auto/v1775614869/InShot_20260325_230936472_ewelxh.mp4",
         includes: [
           "4 Graves de piso",
@@ -310,7 +310,7 @@ export const soundData = [
       {
         id: "s5-p3",
         name: "Paquete Grande",
-        price: 7500,
+        price: 7000,
         video: "https://res.cloudinary.com/dnopl3t98/video/upload/q_auto/f_auto/v1775614837/InShot_20260325_231730466_xbwcsa.mp4",
         includes: [
           "6 Graves de piso",
@@ -331,7 +331,7 @@ export const bandsData = [
   {
     id: "b1",
     type: "Banda norteño",
-    name: "Proveedor I Banda Norteña",
+    name: "Impacto de la sierra",
     mainVideo: "https://res.cloudinary.com/dnopl3t98/video/upload/v1774496244/WhatsApp_Video_2026-03-25_at_9.36.21_PM_bdgm9u.mp4",
     description: "Somos un grupo musical de nueva generacion ayudanos a crecer y seguir tocando",
     packages: [
@@ -348,14 +348,14 @@ export const bandsData = [
   {
     id: "b2",
     type: "Banda norteño",
-    name: "Proveedor II Banda Norteña",
+    name: "Nueva Herencia",
     mainVideo: "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499123/WhatsApp_Video_2026-03-25_at_10.16.45_PM_xauqce.mp4",
     description: "Somos un grupo musical de norteño",
     packages: [
       {
         id: "sb2-p1",
         name: "Trío Norteño",
-        price: 2000,
+        price: 1900,
         video: "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499214/WhatsApp_Video_2026-03-25_at_10.16.53_PM_mpbhxt.mp4",
         extraHourPrice: 1800,
         includes: ["acordeón", "Bajo", "guitarra", "cantante", "Show de 1 hora"],
@@ -373,32 +373,29 @@ export const bandsData = [
   {
     id: "b3",
     type: "Banda norteño",
-    name: "Proveedor III Banda Norteña",
+    name: "Rio Norteño",
     mainVideo: "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499766/WhatsApp_Video_2026-03-25_at_10.21.50_PM_lenmf1.mp4",
     description: "Somos un grupo musical de norteño",
     packages: [
       {
         id: "sb3-p1",
         name: "PAQUETE BÁSICO",
-        price: 2400,
+        price: 2300,
         video: "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499767/WhatsApp_Video_2026-03-25_at_10.21.13_PM_of1qve.mp4",
-        extraHourPrice: 2000,
         includes: ["acordeón", "Bajo", "guitarra", "bajo quinto", "audio para 30 a 50 personas.", "Show de 1 hora"],
       },
       {
         id: "sb3-p2",
         name: "PAQUETE CON PERCUSIÓN",
-        price: 8400,
+        price: 8300,
         video: "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499768/WhatsApp_Video_2026-03-25_at_10.20.50_PM_zdoapr.mp4",
-        extraHourPrice: 2500,
         includes: ["guitarra eléctrica", "bajo electrico", "simulador de batería", "con audio y luces.", "Capacidad: 70 a 100 personas.", "Show de 3 hora"],
       },
       {
         id: "sb3-p3",
         name: "PAQUETE COMPLETO",
-        price: 19900,
+        price: 19800,
         video: "https://res.cloudinary.com/dnopl3t98/video/upload/v1774499768/WhatsApp_Video_2026-03-25_at_10.21.49_PM_ivmpn3.mp4",
-        extraHourPrice: 3500,
         includes: ["Acordeón", "Bajo quinto", "Guitarra electrica", "Bajarra", "requinto", "equínta", "batería completa", "audio", "chisperos", "flamas", "luces", "Capacidad: 150 a 200 personas.", "Show de 5 horas"],
       },
     ],
@@ -440,7 +437,7 @@ export const specialBarsData = [
   },
   {
     id: "hotcakes",
-    name: "Barra de Hot Cakes",
+    name: "Barra de Mini Hot Cakes",
     includes: ["Hot cakes recién hechos en tu evento"],
     options: [
       { id: "liquidos", label: "Líquidos (Máx 3)", max: 3, choices: ["Lechera", "Chocolate", "Cajeta", "Crema de avellana", "Mermelada", "Miel"] },
