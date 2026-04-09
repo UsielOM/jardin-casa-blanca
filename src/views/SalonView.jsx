@@ -106,7 +106,7 @@ const MusicDetailsModal = ({ data, onClose, onSelect, isSelected }) => {
             <div className="lg:w-1/3 flex flex-col gap-4">
                <div className="aspect-[9/16] bg-black rounded-sm overflow-hidden border border-white/10 shadow-2xl relative group">
                   {canLoadVideo ? (
-                    <video className="w-full h-full object-cover z-20 relative" controls playsInline preload="metadata" key={pkg.video} ref={(el) => { if (el) el.volume = 0.2; }}>
+                    <video className="w-full h-full object-cover z-20 relative" controls playsInline preload="metadata" key={pkg.video} ref={(el) => { if (el) el.volume = 0.5; }}>
                       <source src={pkg.video} type="video/mp4" />
                     </video>
                   ) : (
@@ -245,8 +245,8 @@ export default function SalonView() {
   
   const [selections, setSelections] = useState({
     tables: {
-      t1: { active: false, mantelQty: 0, cubreQty: 0, cubreColor: "Rojo" },
-      t2: { active: false, mantelQty: 0, cubreQty: 0, cubreColor: "Rojo" },
+      t1: { active: false, mantelQty: 0, cubreQty: 0, cubreColors: {} },
+      t2: { active: false, mantelQty: 0, cubreQty: 0, cubreColors: {} },
     },
     inflatables: [],
     music: [], 
@@ -348,17 +348,77 @@ export default function SalonView() {
 
   const updateTableQtyConfig = (id, field, change) => {
     setSelections((prev) => {
-      const newQty = Math.max(0, prev.tables[id][field] + change);
-      const newConfig = { ...prev.tables[id], [field]: newQty };
+      const table = prev.tables[id];
+      const newQty = Math.max(0, table[field] + change);
+      let newColors = { ...table.cubreColors };
+
+      if (field === 'cubreQty') {
+        let allocated = Object.values(newColors).reduce((a, b) => a + b, 0);
+        if (allocated > newQty) {
+          let diff = allocated - newQty;
+          const colorKeys = Object.keys(newColors).reverse();
+          for (let k of colorKeys) {
+            if (diff <= 0) break;
+            if (newColors[k] > 0) {
+              const sub = Math.min(newColors[k], diff);
+              newColors[k] -= sub;
+              diff -= sub;
+            }
+          }
+        }
+        if (change > 0 && Object.keys(newColors).length === 1) {
+          const singleColor = Object.keys(newColors)[0];
+          newColors[singleColor] += change;
+        }
+      }
+
+      const newConfig = { ...table, [field]: newQty, cubreColors: newColors };
       return { ...prev, tables: { ...prev.tables, [id]: { ...newConfig, active: (newConfig.mantelQty + newConfig.cubreQty) > 0 } } };
     });
   };
 
-  const updateTableColor = (id, color) => {
-    setSelections(prev => ({
-      ...prev,
-      tables: { ...prev.tables, [id]: { ...prev.tables[id], cubreColor: color } }
-    }));
+  const toggleTableColor = (id, color) => {
+    setSelections(prev => {
+      const table = prev.tables[id];
+      const currentColors = { ...table.cubreColors };
+      
+      if (currentColors[color] !== undefined) {
+        delete currentColors[color];
+      } else {
+        const allocated = Object.values(currentColors).reduce((a, b) => a + b, 0);
+        const unallocated = Math.max(0, table.cubreQty - allocated);
+        currentColors[color] = unallocated;
+      }
+
+      return {
+        ...prev,
+        tables: { ...prev.tables, [id]: { ...table, cubreColors: currentColors } }
+      };
+    });
+  };
+
+  const updateTableColorQty = (id, color, change) => {
+    setSelections(prev => {
+      const table = prev.tables[id];
+      const currentColors = { ...table.cubreColors };
+      const currentQty = currentColors[color] || 0;
+      const newQty = Math.max(0, currentQty + change);
+      
+      const allocatedWithoutThis = Object.entries(currentColors)
+        .filter(([k]) => k !== color)
+        .reduce((sum, [, v]) => sum + v, 0);
+        
+      const maxAllowed = table.cubreQty - allocatedWithoutThis;
+      
+      if (newQty <= maxAllowed) {
+         currentColors[color] = newQty;
+      }
+
+      return {
+        ...prev,
+        tables: { ...prev.tables, [id]: { ...table, cubreColors: currentColors } }
+      };
+    });
   };
 
   const handleMusicSelect = (provider, pkg, config, isRemoving = false) => {
@@ -431,7 +491,15 @@ export default function SalonView() {
       if (t.active) {
         const d = tablesData.find((x) => x.id === k);
         if (t.mantelQty > 0) msg += `🪑 ${t.mantelQty}x ${d.name} (Mantel) - $${t.mantelQty * 100} MXN\n`;
-        if (t.cubreQty > 0) msg += `🪑 ${t.cubreQty}x ${d.name} (Cubre Color: ${t.cubreColor}) - $${t.cubreQty * 110} MXN\n`;
+        if (t.cubreQty > 0) {
+          const coloresAr = Object.entries(t.cubreColors || {})
+            .filter(([, q]) => q > 0)
+            .map(([c, q]) => `${q}x ${c}`);
+          const coloresTxt = coloresAr.length > 0 ? coloresAr.join(', ') : 'Colores sin asignar';
+          
+          msg += `🪑 ${t.cubreQty}x ${d.name} (Mantel + Cubre) - $${t.cubreQty * 110} MXN\n`;
+          msg += `    * Distribución de color: ${coloresTxt}\n`;
+        }
       }
     });
 
@@ -526,6 +594,9 @@ export default function SalonView() {
             <div className="grid grid-cols-1 gap-14">
               {tablesData.map((table) => {
                 const t = selections.tables[table.id];
+                const allocated = Object.values(t.cubreColors || {}).reduce((a, b) => a + b, 0);
+                const unallocated = Math.max(0, t.cubreQty - allocated);
+
                 return (
                   <div key={table.id} className={`flex flex-col lg:flex-row bg-white border border-gray-200 rounded-lg overflow-hidden shadow-lg transition-all duration-500 hover:shadow-2xl ${t.active ? "ring-2 ring-gold" : ""}`}>
                     
@@ -574,34 +645,74 @@ export default function SalonView() {
                         </div>
                       </div>
 
+                      {/* --- PANEL DE ASIGNACIÓN INTELIGENTE DE COLORES --- */}
                       {t.cubreQty > 0 && (
                         <div className="mt-10 pt-8 border-t border-gray-200 animate-fade-in">
-                          <div className="flex items-center gap-3 mb-6">
-                            <Palette className="w-6 h-6 text-gold" />
-                            <p className="text-sm md:text-base font-bold text-gray-600 uppercase tracking-widest">
-                              Color del Cubre: <span className="text-gray-900 ml-2 border-b-2 border-gold pb-1">{t.cubreColor}</span>
-                            </p>
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                            <div className="flex items-center gap-3">
+                              <Palette className="w-6 h-6 text-gold" />
+                              <p className="text-sm md:text-base font-bold text-gray-600 uppercase tracking-widest">Selecciona los colores</p>
+                            </div>
+                            {unallocated > 0 ? (
+                              <span className="text-xs font-bold bg-red-100 text-red-600 px-3 py-1.5 rounded uppercase tracking-widest border border-red-200">Faltan {unallocated} por asignar</span>
+                            ) : (
+                              <span className="text-xs font-bold bg-green-100 text-green-700 px-3 py-1.5 rounded uppercase tracking-widest border border-green-200">✓ Colores Listos</span>
+                            )}
                           </div>
-                          <div className="flex flex-wrap gap-4">
-                            {CUBRE_COLORS.map(color => (
-                              <button 
-                                key={color}
-                                title={color}
-                                onClick={() => updateTableColor(table.id, color)}
-                                className={`
-                                  relative w-12 h-12 rounded-full shadow-md transition-all duration-300
-                                  ${COLOR_SWATCHES[color]} 
-                                  ${t.cubreColor === color 
-                                    ? 'ring-4 ring-gold ring-offset-4 scale-110' 
-                                    : 'border-2 border-gray-200 hover:scale-110 hover:shadow-lg'}
-                                `}
-                              >
-                                {t.cubreColor === color && (
-                                  <Check className="absolute inset-0 m-auto w-6 h-6 text-white drop-shadow-md" />
-                                )}
-                              </button>
-                            ))}
+                          
+                          <div className="flex flex-wrap gap-4 mb-8">
+                            {CUBRE_COLORS.map(color => {
+                              const isSelected = t.cubreColors[color] !== undefined;
+                              return (
+                                <button 
+                                  key={color}
+                                  title={color}
+                                  onClick={() => toggleTableColor(table.id, color)}
+                                  className={`
+                                    relative w-12 h-12 rounded-full shadow-md transition-all duration-300
+                                    ${COLOR_SWATCHES[color]} 
+                                    ${isSelected 
+                                      ? 'ring-4 ring-gold ring-offset-4 scale-110' 
+                                      : 'border-2 border-gray-200 hover:scale-110 hover:shadow-lg'}
+                                  `}
+                                >
+                                  {isSelected && (
+                                    <Check className="absolute inset-0 m-auto w-6 h-6 text-white drop-shadow-md" />
+                                  )}
+                                </button>
+                              )
+                            })}
                           </div>
+
+                          {Object.keys(t.cubreColors).length > 0 && (
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 shadow-inner animate-fade-in">
+                               <div className="flex justify-between items-center border-b border-gray-200 pb-3 mb-4">
+                                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Ajusta la cantidad por color</p>
+                                 <p className="text-xs font-bold text-gray-500">{allocated} de {t.cubreQty} Mesas</p>
+                               </div>
+                               
+                               <div className="space-y-3">
+                                 {Object.keys(t.cubreColors).map(c => (
+                                    <div key={c} className="flex justify-between items-center bg-white p-3 rounded shadow-sm border border-gray-100">
+                                      <div className="flex items-center gap-3">
+                                        <div className={`w-4 h-4 rounded-full shadow-sm border border-gray-200 ${COLOR_SWATCHES[c]}`}></div>
+                                        <span className="text-sm font-bold text-gray-800">{c}</span>
+                                      </div>
+                                      <div className="flex items-center border border-gray-300 rounded h-12">
+                                        <button onClick={() => updateTableColorQty(table.id, c, -1)} className="px-4 text-gold font-bold text-2xl hover:bg-gray-50">-</button>
+                                        <span className="w-10 text-center font-bold text-gray-900">{t.cubreColors[c]}</span>
+                                        <button 
+                                          onClick={() => updateTableColorQty(table.id, c, 1)} 
+                                          disabled={unallocated === 0}
+                                          className={`px-4 font-bold text-2xl hover:bg-gray-50 ${unallocated === 0 ? 'text-gray-300' : 'text-gold'}`}
+                                        >+</button>
+                                      </div>
+                                    </div>
+                                 ))}
+                               </div>
+                            </div>
+                          )}
+
                         </div>
                       )}
 
@@ -627,28 +738,28 @@ export default function SalonView() {
             <div className="max-w-4xl mx-auto relative mb-12">
               <div className={`bg-white border transition-all duration-300 rounded-xl flex flex-col overflow-hidden ${isConfiguringBar ? 'border-gold shadow-2xl ring-2 ring-gold scale-[1.02] z-10' : 'border-gray-300 shadow-lg'}`}>
                 
-                <div className="bg-gray-50 border-b border-gray-300 p-5 md:p-8 flex justify-between items-center">
-                  <button onClick={prevSpecialBar} className="p-4 bg-white border border-gray-300 rounded-full hover:bg-gold hover:text-white hover:border-gold transition-colors shadow-md">
-                    <ChevronLeft className="w-6 h-6" />
+                <div className="bg-gray-50 border-b border-gray-300 p-3 sm:p-6 md:p-8 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 sm:gap-6">
+                  <button onClick={prevSpecialBar} className="flex-shrink-0 p-2 sm:p-4 bg-white border border-gray-300 rounded-full hover:bg-gold hover:text-white hover:border-gold transition-colors shadow-md">
+                    <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
                   </button>
                   
-                  <div className="text-center px-6 flex flex-col items-center justify-center">
-                    <p className="text-sm text-gray-500 font-bold uppercase tracking-widest mb-2 hidden sm:block">Catálogo de Barras ({currentBarIndex + 1}/{specialBarsData.length})</p>
-                    <div className="flex items-center gap-3">
-                      <h4 className="font-serif text-3xl md:text-4xl text-gray-900 font-bold uppercase tracking-widest leading-tight">
+                  <div className="text-center flex flex-col items-center justify-center min-w-0 px-1">
+                    <p className="text-[9px] sm:text-xs text-gray-500 font-bold uppercase tracking-widest mb-1 sm:mb-2 hidden sm:block">Catálogo de Barras ({currentBarIndex + 1}/{specialBarsData.length})</p>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 w-full">
+                      <h4 className="font-serif text-base sm:text-2xl md:text-4xl text-gray-900 font-bold uppercase tracking-widest leading-tight text-center break-words w-full">
                         {currentBar.name}
                       </h4>
-                      {isAlreadyAdded && <CheckCircle className="w-8 h-8 text-green-600 hidden sm:block" />}
+                      {isAlreadyAdded && <CheckCircle className="w-4 h-4 sm:w-8 sm:h-8 text-green-600 flex-shrink-0 hidden sm:block" />}
                     </div>
                   </div>
 
-                  <button onClick={nextSpecialBar} className="p-4 bg-white border border-gray-300 rounded-full hover:bg-gold hover:text-white hover:border-gold transition-colors shadow-md">
-                    <ChevronRight className="w-6 h-6" />
+                  <button onClick={nextSpecialBar} className="flex-shrink-0 p-2 sm:p-4 bg-white border border-gray-300 rounded-full hover:bg-gold hover:text-white hover:border-gold transition-colors shadow-md">
+                    <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
                   </button>
                 </div>
 
-                <div className="p-8 md:p-12 flex-grow flex flex-col">
-                  <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-10 flex-grow text-center font-medium">
+                <div className="p-6 sm:p-8 md:p-12 flex-grow flex flex-col">
+                  <p className="text-sm md:text-lg text-gray-600 leading-relaxed mb-8 sm:mb-10 flex-grow text-center font-medium">
                     {currentBar.includes.length > 0 ? (
                       <><strong className="text-gray-900">Incluye:</strong> {currentBar.includes.join(", ")}.</>
                     ) : (
@@ -659,44 +770,44 @@ export default function SalonView() {
                   {!isConfiguringBar && (
                     <button
                       onClick={handleOpenConfig}
-                      className={`w-full py-5 text-sm md:text-base font-bold uppercase tracking-widest border-2 rounded-md transition-colors shadow-sm ${isAlreadyAdded ? 'border-green-600 text-green-700 hover:bg-green-50' : 'border-gray-300 text-gray-700 hover:border-gold hover:text-gold hover:bg-yellow-50'}`}
+                      className={`w-full py-4 sm:py-5 text-xs sm:text-sm md:text-base font-bold uppercase tracking-widest border-2 rounded-md transition-colors shadow-sm ${isAlreadyAdded ? 'border-green-600 text-green-700 hover:bg-green-50' : 'border-gray-300 text-gray-700 hover:border-gold hover:text-gold hover:bg-yellow-50'}`}
                     >
                       {isAlreadyAdded ? '✓ Modificar esta Barra' : 'Configurar esta Barra'}
                     </button>
                   )}
 
                   {isConfiguringBar && (
-                    <div className="mt-4 animate-fade-in flex flex-col gap-8">
+                    <div className="mt-4 animate-fade-in flex flex-col gap-6 sm:gap-8">
                       
-                      <div className="bg-gray-50 border border-gray-300 rounded-lg p-6 flex flex-col items-center shadow-inner">
-                         <p className="text-sm text-gray-600 font-bold uppercase tracking-widest mb-4 text-center">¿Para cuántas personas?</p>
-                         <div className="flex items-center justify-center gap-8">
-                           <button onClick={() => setSpecialBarDraft(prev => ({...prev, qty: Math.max(50, prev.qty - 10)}))} className="w-12 h-12 flex items-center justify-center bg-white border border-gray-300 rounded text-gold hover:text-gray-900 hover:bg-gray-100 font-bold text-4xl leading-none shadow-sm">-</button>
-                           <span className="w-20 text-center font-bold text-3xl text-gray-900">{specialBarDraft.qty}</span>
-                           <button onClick={() => setSpecialBarDraft(prev => ({...prev, qty: Math.min(200, prev.qty + 10)}))} className="w-12 h-12 flex items-center justify-center bg-white border border-gray-300 rounded text-gold hover:text-gray-900 hover:bg-gray-100 font-bold text-4xl leading-none shadow-sm">+</button>
+                      <div className="bg-gray-50 border border-gray-300 rounded-lg p-5 sm:p-6 flex flex-col items-center shadow-inner">
+                         <p className="text-xs sm:text-sm text-gray-600 font-bold uppercase tracking-widest mb-4 text-center">¿Para cuántas personas?</p>
+                         <div className="flex items-center justify-center gap-6 sm:gap-8">
+                           <button onClick={() => setSpecialBarDraft(prev => ({...prev, qty: Math.max(50, prev.qty - 10)}))} className="w-10 sm:w-12 h-10 sm:h-12 flex items-center justify-center bg-white border border-gray-300 rounded text-gold hover:text-gray-900 hover:bg-gray-100 font-bold text-3xl sm:text-4xl leading-none shadow-sm">-</button>
+                           <span className="w-16 sm:w-20 text-center font-bold text-2xl sm:text-3xl text-gray-900">{specialBarDraft.qty}</span>
+                           <button onClick={() => setSpecialBarDraft(prev => ({...prev, qty: Math.min(200, prev.qty + 10)}))} className="w-10 sm:w-12 h-10 sm:h-12 flex items-center justify-center bg-white border border-gray-300 rounded text-gold hover:text-gray-900 hover:bg-gray-100 font-bold text-3xl sm:text-4xl leading-none shadow-sm">+</button>
                          </div>
                       </div>
 
                       {currentBar.options.length > 0 && (
-                        <div className="space-y-8 mt-4">
+                        <div className="space-y-6 sm:space-y-8 mt-2 sm:mt-4">
                           {currentBar.options.map(opt => {
                             const currentList = specialBarDraft.options[opt.id] || [];
                             return (
                               <div key={opt.id}>
-                                <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
-                                  <p className="font-bold text-sm uppercase tracking-widest text-gray-900">{opt.label}</p>
-                                  <span className="text-xs text-gray-500 font-bold bg-gray-100 px-2 py-1 rounded">
+                                <div className="flex justify-between items-center mb-3 sm:mb-4 border-b border-gray-200 pb-2">
+                                  <p className="font-bold text-xs sm:text-sm uppercase tracking-widest text-gray-900">{opt.label}</p>
+                                  <span className="text-[10px] sm:text-xs text-gray-500 font-bold bg-gray-100 px-2 py-1 rounded">
                                     {currentList.length} / {opt.max}
                                   </span>
                                 </div>
-                                <div className="flex flex-wrap gap-3">
+                                <div className="flex flex-wrap gap-2 sm:gap-3">
                                   {opt.choices.map(choice => {
                                     const isSelected = currentList.includes(choice);
                                     return (
                                       <button
                                         key={choice}
                                         onClick={() => toggleSpecialBarDraftOption(opt.id, choice, opt.max)}
-                                        className={`px-5 py-3 text-sm md:text-base font-bold rounded-md border-2 transition-colors ${isSelected ? 'bg-gold border-gold text-white shadow-lg' : 'border-gray-300 text-gray-700 hover:border-gold/50 hover:text-gray-900 bg-white hover:bg-gray-50'}`}
+                                        className={`px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm md:text-base font-bold rounded-md border-2 transition-colors ${isSelected ? 'bg-gold border-gold text-white shadow-lg' : 'border-gray-300 text-gray-700 hover:border-gold/50 hover:text-gray-900 bg-white hover:bg-gray-50'}`}
                                       >
                                         {choice}
                                       </button>
@@ -709,11 +820,11 @@ export default function SalonView() {
                         </div>
                       )}
 
-                      <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-8 border-t border-gray-200">
-                         <button onClick={() => setIsConfiguringBar(false)} className="w-full sm:w-1/3 py-5 text-sm font-bold uppercase tracking-widest border-2 border-gray-300 text-gray-600 rounded-md hover:bg-gray-100 transition-colors shadow-sm">
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-200">
+                         <button onClick={() => setIsConfiguringBar(false)} className="w-full sm:w-1/3 py-4 sm:py-5 text-xs sm:text-sm font-bold uppercase tracking-widest border-2 border-gray-300 text-gray-600 rounded-md hover:bg-gray-100 transition-colors shadow-sm">
                            Cancelar
                          </button>
-                         <button onClick={addSpecialBarToQuote} className={`w-full sm:w-2/3 py-5 text-sm md:text-base font-bold uppercase tracking-widest text-white rounded-md shadow-lg transition-all transform hover:scale-[1.02] ${isAlreadyAdded ? 'bg-green-600 hover:bg-green-700' : 'bg-gold hover:bg-yellow-600'}`}>
+                         <button onClick={addSpecialBarToQuote} className={`w-full sm:w-2/3 py-4 sm:py-5 text-xs sm:text-sm md:text-base font-bold uppercase tracking-widest text-white rounded-md shadow-lg transition-all transform hover:scale-[1.02] ${isAlreadyAdded ? 'bg-green-600 hover:bg-green-700' : 'bg-gold hover:bg-yellow-600'}`}>
                            {isAlreadyAdded ? 'Actualizar mi cotización' : 'Agregar a mi cotización'}
                          </button>
                       </div>
@@ -843,7 +954,7 @@ export default function SalonView() {
             <div key={currentArtist.id} className="fade-in">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center bg-gray-800/50 p-8 md:p-16 rounded-xl border border-white/10 relative shadow-2xl">
                 <div className="lg:col-span-7 rounded-xl overflow-hidden shadow-2xl aspect-video bg-black border border-gray-700">
-                  <video className="w-full h-full object-cover" controls playsInline key={currentArtist.mainVideo} ref={(el) => { if (el) el.volume = 0.1; }}>
+                  <video className="w-full h-full object-cover" controls playsInline key={currentArtist.mainVideo} ref={(el) => { if (el) el.volume = 0.5; }}>
                     <source src={currentArtist.mainVideo} type="video/mp4" />
                   </video>
                 </div>
@@ -886,7 +997,7 @@ export default function SalonView() {
                           }`}
                         >
                           <div className="h-48 relative overflow-hidden bg-black flex-shrink-0 border-b border-gray-800" onClick={(e) => e.stopPropagation()}>
-                            <video className="w-full h-full object-cover z-20 relative opacity-80 group-hover:opacity-100 transition-opacity" controls playsInline key={pkg.video} ref={(el) => { if (el) el.volume = 0.1; }}>
+                            <video className="w-full h-full object-cover z-20 relative opacity-80 group-hover:opacity-100 transition-opacity" controls playsInline key={pkg.video} ref={(el) => { if (el) el.volume = 0.5; }}>
                               <source src={pkg.video} type="video/mp4" />
                             </video>
                           </div>
@@ -1049,7 +1160,17 @@ export default function SalonView() {
                          <div key={k} className="pt-4 pb-4 border-b border-gray-200 space-y-3">
                            <p className="text-xs md:text-sm text-gold uppercase tracking-widest">{d.name}</p>
                            {t.mantelQty > 0 && <div className="flex justify-between items-center ml-4 text-sm"><span>{t.mantelQty}x Con Mantel</span> <span>${t.mantelQty * 100}</span></div>}
-                           {t.cubreQty > 0 && <div className="flex justify-between items-center ml-4 text-sm"><span>{t.cubreQty}x Mantel + Cubre ({t.cubreColor})</span> <span>${t.cubreQty * 110}</span></div>}
+                           {t.cubreQty > 0 && (
+                             <div className="ml-4 space-y-1">
+                               <div className="flex justify-between items-center text-sm">
+                                 <span>{t.cubreQty}x Mantel + Cubre</span> 
+                                 <span>${t.cubreQty * 110}</span>
+                               </div>
+                               {Object.entries(t.cubreColors || {}).filter(([,q])=>q>0).map(([c, q]) => (
+                                 <p key={c} className="text-xs text-gray-500 uppercase ml-4">↳ {q}x {c}</p>
+                               ))}
+                             </div>
+                           )}
                          </div>
                        );
                      })}
