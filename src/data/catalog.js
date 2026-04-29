@@ -404,7 +404,7 @@ export const bandsData = [
 
 // --- CABAÑA ---
 export const cabinData = {
-  price: 600,
+  price: 500,
   desc: "Descansa rodeado de naturaleza. Nuestra cabaña está diseñada para brindarte privacidad, confort y todo lo necesario para sentirte como en casa.",
   amenities: [
     "2 recámaras (3 camas matrimoniales)",
