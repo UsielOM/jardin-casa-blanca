@@ -588,7 +588,7 @@ export default function SalonView() {
         </section>
 
         {/* 2. MOBILIARIO */}
-        <section id="mesas" className="py-20 md:py-28 px-4 bg-gray-50 border-b border-gray-100">
+        <section id="mesas" className="py-20 md:py-28 px-4 bg-gray-50 border-b border-gray-100" translate="no">
           <div className="max-w-6xl mx-auto">
             <h2 className="font-serif text-4xl md:text-5xl text-gold text-center font-bold mb-16 uppercase tracking-tight">Selección de Mobiliario</h2>
             <div className="grid grid-cols-1 gap-14">

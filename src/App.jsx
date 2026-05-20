@@ -33,7 +33,7 @@ export default function App() {
   };
 
   return (
-    <div className="font-sans text-gray-800 bg-white min-h-screen">
+    <div className="font-sans text-gray-800 bg-white min-h-screen" translate="no">
       {/* Estilos Globales (Fuentes y Animaciones) */}
       <style dangerouslySetInnerHTML={{__html: `
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Great+Vibes&family=Montserrat:wght@500;600;700&display=swap');
@@ -50,7 +50,8 @@ export default function App() {
       `}} />
 
       {/* 1. BARRA DE NAVEGACIÓN */}
-      <Navbar 
+      <Navbar
+        translate="no"
         scrolled={scrolled}
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
@@ -59,7 +60,7 @@ export default function App() {
       />
 
       {/* 2. CONTENIDO DINÁMICO (VISTAS) */}
-      <main>
+      <main translate="no">
         {activeFlow === 'none' && (
           <HomeSelection onFlowSelect={handleFlowSelect} />
         )}
@@ -80,7 +81,7 @@ export default function App() {
       <LocationMap />
 
       {/* 4. PIE DE PÁGINA */}
-      <Footer onHomeClick={() => handleFlowSelect('none')} />
+      <Footer onHomeClick={() => handleFlowSelect('none')} translate="no" />
     </div>
   );
 }
